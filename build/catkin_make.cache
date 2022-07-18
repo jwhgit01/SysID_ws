@@ -1,0 +1,2 @@
+sysid_pkg
+-DCATKIN_DEVEL_PREFIX=/home/nsl/src/RotorSysID_ws/devel -DCMAKE_INSTALL_PREFIX=/home/nsl/src/RotorSysID_ws/install -G Unix Makefiles

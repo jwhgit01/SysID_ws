@@ -1,0 +1,8 @@
+prefix=/home/nsl/src/RotorSysID_ws/devel
+
+Name: sysid_pkg
+Description: Description of sysid_pkg
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
