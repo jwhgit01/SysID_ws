@@ -18,6 +18,8 @@
 #include <mavros_msgs/ActuatorControl.h>
 #include <geometry_msgs/TwistStamped.h>
 
+#include "SysIDTools.h"
+
 using namespace std;
 
 /**
@@ -112,6 +114,14 @@ int main( int argc, char **argv ) {
 	// Initialize the phase of the switches
 	//
 	bool PTI = false;
+	//
+	// Load the CSV file into a map
+	//
+	map<int,vector<double>> InputData;
+	load_data(InputData,file0);
+	#if DEBUG
+		ROS_INFO_STREAM("Input data map created sucessfully!");
+	#endif
 	//
 	// data logging file header
 	// 

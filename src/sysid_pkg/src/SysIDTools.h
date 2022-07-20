@@ -14,11 +14,7 @@ using namespace std;
  * @short Read input data from CSV and place in a map
  * @details First column of CSV must be integers represting miliseconds
  */
-map load_data(string filepath) {
-	//
-	// create hashmap object
-	//
-	map<int,vector<float>> m;
+void load_data(map<int,vector<float>> & m, string filepath) {
 	//
 	// read data from CSV file
 	//
@@ -41,9 +37,9 @@ map load_data(string filepath) {
 			values.push_back(stof(cell));
 		}
 		//
-		// assign the vector of values to the time key
+		// assign the vector of values to the integer time key
 		//
 		m[t] = values;
 	}
-	return m;
+	return;
 }
