@@ -24,9 +24,25 @@ using namespace std;
  * @section Parameters to configure 
  */
 //
+// CSV input file(s)
+// 	Note: first column of CSV file must be integers represiting miliseconds.
+// 	Because we use a hashmap to acess this data, the intervals may be irregular, but must be ordered.
+//
+const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
+//
 // Main ROS loop rate (Hz)
+// 	This should (but need not) be greater than or equal to the
+// 	fastest sample rate of the csv data file(s) defined above.
 //
 #define SAMPLERATE 100.0
+//
+// Debugging mode
+//
+#define DEBUG true
+//
+// Onboard data logging (setup TODO if needed)
+//
+#define LOGDATA false
 
 /**
  * @section Callback functions that get data from the relevant MAVROS topic
@@ -90,8 +106,31 @@ void inert_vel_cb( const geometry_msgs::TwistStamped::ConstPtr& msg ) {
  */
 int main( int argc, char **argv ) {
 	/**
-	 * @section Set up ROS
+	 * @section Initialize variables and ROS node
 	 */
+	//
+	// Initialize the phase of the switches
+	//
+	bool PTI = false;
+	//
+	// data logging file header
+	// 
+	// TODO: only do this once armed and close the file once disarmed.
+	//
+	#if LOGDATA
+		time_t t = time(0);   // get current time
+		struct tm * now = localtime( & t ); // current date-time for file naming
+		char buffer [80]; // 80 byte buffer
+		strftime (buffer,80,"/home/nsl/src/spincontrol_ws/logs/%F-%H-%M.csv",now); // YYYY-MM-DD-HH-MM
+		ofstream myfile; // object for data output
+		myfile.open (buffer); // open the file
+		myfile <<"t,x,y,z,phi,theta,psi,u,v,w,p,q,r,vN,vE,vD,da,de,dr,ctrlID,\n";
+		ros::Time last_request = ros::Time::now(); // why is this here?
+		//
+		// IO format for eigen objects
+		//
+		IOFormat csvfmt(StreamPrecision, DontAlignCols, ",", ",", "", "", "", "");
+	#endif
 	//
 	// Initialize the node and create the node handle
 	//
@@ -138,7 +177,7 @@ int main( int argc, char **argv ) {
 	//
 	// send a few setpoints before starting
 	//
-	for(int i = 100; ros::ok() && i > 0; --i){
+	for (int i = 100; ros::ok() && i > 0; --i) {
 		ros::spinOnce();
 		rate.sleep();
 	}
@@ -147,21 +186,87 @@ int main( int argc, char **argv ) {
 	 * @brief Main loop
 	 * @details While everything is okay, loop at the specified rate, SAMPLERATE
 	 */
-	while ( ros::ok() ) {
+	while (ros::ok()) {
 		/**
-		 * @section Check the main mode switch
+		 * @section Check the PTI switch
 		 */
 		//
 		// If the PTI switch it OFF,
 		//
+		if (!PTI) {
+			//
+			// Pass through manual inputs as velocity commands with amp = m/s
+			//
+			cmd_vel.twist.linear.x = amp*manual_input.x;
+			cmd_vel.twist.linear.y = amp*manual_input.y;
+			cmd_vel.twist.linear.z = amp*manual_input.z;
+			// cmd_vel.twist.angular.x = 0.0;
+			// cmd_vel.twist.angular.y = 0.0;
+			// cmd_vel.twist.angular.z = amp*manual_input.r;
+			//
+			// Check PTI mode switch(es) here
+			//
+			//
+			// If it is different from current, switch 
+			//
+			// if ( mode != mode_Meas ) {
+				//
+				// update the current ctrl selection
+				//
+				// mode = mode_Meas; 
+				//
+				// reset any necessary variables
+				//
+			// }
+			//
+			// If we have switched to PTI mode, capture initial conditions, etc.
+			//
+			if ( PTI_PWM > 1500 ) {
+				#if DEBUG
+					ROS_INFO_STREAM("PTI On");
+				#endif
+				//
+				// update PTI logical
+				// 
+				PTI =  true;
+			}
+		//
+		// If the PTI switch is ON,
+		//
+		} else { 
+			//
+			// Read the current state of the aircraft if necessary...
+			//
+			//
+			//
+			// Pass through manual inputs as velocity commands with amp = m/s
+			//
+			cmd_vel.twist.linear.x = amp*manual_input.x;
+			cmd_vel.twist.linear.y = amp*manual_input.y;
+			cmd_vel.twist.linear.z = amp*manual_input.z; 
+			//
+			// write to data logging file if needed
+			//
+			// #if LOGDATA
+				// myfile << ros::Time::now() << "," << x.format(csvfmt) << "," << input_rad[0] << "," << input_rad[1] << "," << input_rad[2] << "," << ControlID << "\n";
+			// #endif
+			//
+			// If the PTI switch has been set back to off, set the PRI bool to false
+			//
+			if ( PTI_PWM <= 1500 ) {
+				#if DEBUG
+					ROS_INFO_STREAM("PTI Off");
+				#endif
+				PTI = false;
+			}
+		}
 		
-		//
-		// Pass through manual inputs as velocity commands with amp = m/s
-		//
-		cmd_vel.header.time = ros::Time::now();
-		cmd_vel.twist.linear.x = amp*manual_input.x;
-		cmd_vel.twist.linear.y = amp*manual_input.y;
-		cmd_vel.twist.linear.z = amp*manual_input.z;
+		/**
+		 * @section Publish velocity commands
+		 */
+		#if DEBUG
+			ROS_INFO_STREAM("x = " << cmd_vel.twist.linear.x << ", y = " << cmd_vel.twist.linear.y ", z = " << cmd_vel.twist.linear.z);
+		#endif
 		//
 		// Publish
 		//
