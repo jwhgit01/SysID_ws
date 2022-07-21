@@ -4,9 +4,10 @@
  */
 #pragma once
 
-#include <vector>
-#include <fstream>
-#include <string>
+#include<vector>
+#include<fstream>
+#include<string>
+#include<map>
 
 using namespace std;
 
@@ -14,12 +15,12 @@ using namespace std;
  * @short Read input data from CSV and place in a map
  * @details First column of CSV must be integers represting miliseconds
  */
-void load_data(map<int,vector<float>> & m, string filepath) {
+void load_data(map<int,vector<float>> &m, const string filepath) {
 	//
 	// read data from CSV file
 	//
 	ifstream indata;
-	indata.open(path);
+	indata.open(filepath);
 	string line;
 	int t = 0;
 	while (getline(indata, line)) {

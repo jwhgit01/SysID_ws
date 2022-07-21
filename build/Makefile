@@ -454,6 +454,19 @@ rosgraph_msgs_generate_messages_lisp/fast:
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named vel_cmd_node
+
+# Build rule for target.
+vel_cmd_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vel_cmd_node
+.PHONY : vel_cmd_node
+
+# fast build rule for target.
+vel_cmd_node/fast:
+	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/build
+.PHONY : vel_cmd_node/fast
+
+#=============================================================================
 # Target rules for targets named roscpp_generate_messages_lisp
 
 # Build rule for target.
@@ -514,6 +527,7 @@ help:
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
+	@echo "... vel_cmd_node"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
 .PHONY : help

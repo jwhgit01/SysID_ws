@@ -204,6 +204,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/DependInfo.cmake"
   "sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/DependInfo.cmake"
   "sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/DependInfo.cmake"
+  "sysid_pkg/CMakeFiles/vel_cmd_node.dir/DependInfo.cmake"
   "sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/DependInfo.cmake"
   "sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/DependInfo.cmake"
   )

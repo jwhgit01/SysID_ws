@@ -1,6 +1,6 @@
 set(_CATKIN_CURRENT_PACKAGE "sysid_pkg")
 set(sysid_pkg_VERSION "0.0.0")
-set(sysid_pkg_MAINTAINER "nsl <nsl@todo.todo>")
+set(sysid_pkg_MAINTAINER "Jeremy Hopwood <jeremyhopwood@vt.edu>")
 set(sysid_pkg_PACKAGE_FORMAT "2")
 set(sysid_pkg_BUILD_DEPENDS "roscpp" "std_msgs")
 set(sysid_pkg_BUILD_EXPORT_DEPENDS "roscpp" "std_msgs")

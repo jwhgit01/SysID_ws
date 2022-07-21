@@ -76,16 +76,6 @@ void manual_cb( const mavros_msgs::ManualControl::ConstPtr& msg ) {
 	manual_input = *msg;
 }
 //
-// Local position and attitude quaternion from FCU
-// ~local_position/pose (geometry_msgs/PoseStamped)
-// Notes: position is in the ENU frame (xNED=yENU, yNED=xENU, zNED=-zENU)
-//		  unit quaternion (x,y,z,w) = w+xi+yj+zk 
-//
-geometry_msgs::PoseStamped pose_data;
-void pose_cb( const geometry_msgs::PoseStamped::ConstPtr& msg ) {
-	pose_data = *msg;
-}
-//
 // Velocity data from FCU.
 // ~local_position/velocity (geometry_msgs/TwistStamped)
 //
@@ -114,10 +104,11 @@ int main( int argc, char **argv ) {
 	// Initialize the phase of the switches
 	//
 	bool PTI = false;
+	int PTI_PWM = 0;
 	//
 	// Load the CSV file into a map
 	//
-	map<int,vector<double>> InputData;
+	map<int,vector<float>> InputData;
 	load_data(InputData,file0);
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created sucessfully!");
@@ -155,14 +146,12 @@ int main( int argc, char **argv ) {
 		("mavros/rc/in", 1, rcin_cb);
 	ros::Subscriber manual_in_sub = nh.subscribe<mavros_msgs::ManualControl>
 		("mavros/manual_control/control", 1, manual_cb);
-	ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>
-		("mavros/local_position/pose", 1, pose_cb);
 	ros::Subscriber body_vel_sub = nh.subscribe<geometry_msgs::TwistStamped>
 		("mavros/local_position/velocity_body", 1, body_vel_cb);
 	ros::Subscriber inert_vel_sub = nh.subscribe<geometry_msgs::TwistStamped>
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
-	ros::Publisher cmd_vel_pub = nh.advertise<mavros_msgs::Twist>
-		("mavros/setpoint_attitude/cmd_vel", 1);
+	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
+		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
 	//
 	// ROS rate:
 	// 		Defines the rate at which the control loop runs.
@@ -182,7 +171,7 @@ int main( int argc, char **argv ) {
 	//
 	// Creates the variable used to send velocity commands
 	//
-	mavros_msgs::TwistStamped cmd_vel;
+	geometry_msgs::Twist cmd_vel;
 	ROS_INFO_STREAM("ROS is ready"); 
 	//
 	// send a few setpoints before starting
@@ -207,9 +196,9 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.twist.linear.x = amp*manual_input.x;
-			cmd_vel.twist.linear.y = amp*manual_input.y;
-			cmd_vel.twist.linear.z = amp*manual_input.z;
+			cmd_vel.linear.x = amp*manual_input.x;
+			cmd_vel.linear.y = amp*manual_input.y;
+			cmd_vel.linear.z = amp*manual_input.z;
 			// cmd_vel.twist.angular.x = 0.0;
 			// cmd_vel.twist.angular.y = 0.0;
 			// cmd_vel.twist.angular.z = amp*manual_input.r;
@@ -251,9 +240,9 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.twist.linear.x = amp*manual_input.x;
-			cmd_vel.twist.linear.y = amp*manual_input.y;
-			cmd_vel.twist.linear.z = amp*manual_input.z; 
+			cmd_vel.linear.x = amp*manual_input.x;
+			cmd_vel.linear.y = amp*manual_input.y;
+			cmd_vel.linear.z = amp*manual_input.z; 
 			//
 			// write to data logging file if needed
 			//
@@ -275,7 +264,7 @@ int main( int argc, char **argv ) {
 		 * @section Publish velocity commands
 		 */
 		#if DEBUG
-			ROS_INFO_STREAM("x = " << cmd_vel.twist.linear.x << ", y = " << cmd_vel.twist.linear.y ", z = " << cmd_vel.twist.linear.z);
+			ROS_INFO_STREAM("x = " << cmd_vel.linear.x << ", y = " << cmd_vel.linear.y << ", z = " << cmd_vel.linear.z);
 		#endif
 		//
 		// Publish
