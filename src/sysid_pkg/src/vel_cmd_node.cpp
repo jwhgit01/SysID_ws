@@ -10,8 +10,10 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 #include <mavros_msgs/State.h>
 #include <mavros_msgs/RCIn.h>
 #include <mavros_msgs/ManualControl.h>
@@ -92,6 +94,16 @@ void inert_vel_cb( const geometry_msgs::TwistStamped::ConstPtr& msg ) {
 	inert_vel_data = *msg;
 }
 
+/**
+ * @brief Fucntion for publishing debugging info to debug_pub
+ */
+void Debug( ros::Publisher debug_pub, string info_str ) {
+	std_msgs::String msg;
+	std::stringstream ss;
+	ss << info_str << count;
+	msg.data = ss.str();
+	debug_pub.publish(msg);
+}
 
 /**
  * @short Main ROS function
@@ -135,7 +147,7 @@ int main( int argc, char **argv ) {
 	//
 	// Initialize the node and create the node handle
 	//
-	ros::init(argc, argv, "VelCmd_node");
+	ros::init(argc, argv, "vel_cmd_node");
 	ros::NodeHandle nh;
 	//
 	// Create subscribers and publishers
@@ -152,6 +164,14 @@ int main( int argc, char **argv ) {
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
 		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
+	ros::Publisher debug_pub = n.advertise<std_msgs::String>
+		("chatter", 1000);
+	//
+	// check debugging topic
+	//
+	#if DEBUG
+		Debug(debug_pub, "Published to debug_pub sucessfully!");
+	#endif
 	//
 	// ROS rate:
 	// 		Defines the rate at which the control loop runs.
@@ -165,6 +185,9 @@ int main( int argc, char **argv ) {
 	//
 	while ( ros::ok() && !current_state.connected ) {
 		ROS_INFO_STREAM("Waiting!");
+		#if DEBUG
+			Debug(debug_pub, "Waiting for FCU connection...");
+		#endif
 		ros::spinOnce();
 		rate.sleep();
 	}
@@ -172,7 +195,6 @@ int main( int argc, char **argv ) {
 	// Creates the variable used to send velocity commands
 	//
 	geometry_msgs::Twist cmd_vel;
-	ROS_INFO_STREAM("ROS is ready"); 
 	//
 	// send a few setpoints before starting
 	//
@@ -180,6 +202,9 @@ int main( int argc, char **argv ) {
 		ros::spinOnce();
 		rate.sleep();
 	}
+	#if DEBUG
+		Debug(debug_pub, "ROS is ready!");
+	#endif
 
 	/**
 	 * @brief Main loop
@@ -222,7 +247,7 @@ int main( int argc, char **argv ) {
 			//
 			if ( PTI_PWM > 1500 ) {
 				#if DEBUG
-					ROS_INFO_STREAM("PTI On");
+					Debug(debug_pub, "PTI On");
 				#endif
 				//
 				// update PTI logical
@@ -254,7 +279,7 @@ int main( int argc, char **argv ) {
 			//
 			if ( PTI_PWM <= 1500 ) {
 				#if DEBUG
-					ROS_INFO_STREAM("PTI Off");
+					Debug(debug_pub, "PTI Off");
 				#endif
 				PTI = false;
 			}
@@ -264,7 +289,9 @@ int main( int argc, char **argv ) {
 		 * @section Publish velocity commands
 		 */
 		#if DEBUG
-			ROS_INFO_STREAM("x = " << cmd_vel.linear.x << ", y = " << cmd_vel.linear.y << ", z = " << cmd_vel.linear.z);
+			string debugStr;
+			debugStr << "x = " << cmd_vel.linear.x << ", y = " << cmd_vel.linear.y << ", z = " << cmd_vel.linear.z;
+			Debug(debug_pub, debugStr);
 		#endif
 		//
 		// Publish
