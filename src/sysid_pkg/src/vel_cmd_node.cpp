@@ -10,7 +10,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <sstream>
+#include <iostream>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -22,7 +22,7 @@
 
 #include "SysIDTools.h"
 
-using namespace std;
+// using namespace std;
 
 /**
  * @section Parameters to configure 
@@ -48,6 +48,18 @@ const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
 //
 #define LOGDATA false
 
+
+/**
+ * @brief Fucntion for publishing debugging info to debug_pub
+ */
+void Debug( ros::Publisher debug_pub, string info_str ) {
+	std_msgs::String msg;
+	std:stringstream ss;
+	ss << info_str;
+	msg.data = ss.str();
+	debug_pub.publish(msg);
+}
+
 /**
  * @section Callback functions that get data from the relevant MAVROS topic
  */
@@ -65,9 +77,16 @@ void state_cb( const mavros_msgs::State::ConstPtr& msg ) {
 //
 mavros_msgs::RCIn rc_input;
 double amp = 0.0;
+int PTI_PWM = 0;
+double da_cmd, de_cmd, dr_cmd, dt_cmd;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	rc_input = *msg;
-	amp = 1.0*(rc_input.channels[5]-1100)/800.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
+	da_cmd = 2.0*(rc_input.channels[0]-1500)/796.0;
+	de_cmd = 2.0*(rc_input.channels[1]-1500)/796.0;
+	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
+	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
+	PTI_PWM = rc_input.channels[6];
+	amp = 1.0*(rc_input.channels[9]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 }
 //
 // RC Rx, interpreted and normalized.
@@ -95,17 +114,6 @@ void inert_vel_cb( const geometry_msgs::TwistStamped::ConstPtr& msg ) {
 }
 
 /**
- * @brief Fucntion for publishing debugging info to debug_pub
- */
-void Debug( ros::Publisher debug_pub, string info_str ) {
-	std_msgs::String msg;
-	std::stringstream ss;
-	ss << info_str << count;
-	msg.data = ss.str();
-	debug_pub.publish(msg);
-}
-
-/**
  * @short Main ROS function
  */
 int main( int argc, char **argv ) {
@@ -116,7 +124,6 @@ int main( int argc, char **argv ) {
 	// Initialize the phase of the switches
 	//
 	bool PTI = false;
-	int PTI_PWM = 0;
 	//
 	// Load the CSV file into a map
 	//
@@ -164,8 +171,8 @@ int main( int argc, char **argv ) {
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
 		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
-	ros::Publisher debug_pub = n.advertise<std_msgs::String>
-		("chatter", 1000);
+	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
+		("debug_pub", 10);
 	//
 	// check debugging topic
 	//
@@ -221,9 +228,9 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = amp*manual_input.x;
-			cmd_vel.linear.y = amp*manual_input.y;
-			cmd_vel.linear.z = amp*manual_input.z;
+			cmd_vel.linear.x = amp*da_cmd;
+			cmd_vel.linear.y = amp*de_cmd;
+			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0); 
 			// cmd_vel.twist.angular.x = 0.0;
 			// cmd_vel.twist.angular.y = 0.0;
 			// cmd_vel.twist.angular.z = amp*manual_input.r;
@@ -265,9 +272,9 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = amp*manual_input.x;
-			cmd_vel.linear.y = amp*manual_input.y;
-			cmd_vel.linear.z = amp*manual_input.z; 
+			cmd_vel.linear.x = amp*da_cmd;
+			cmd_vel.linear.y = amp*de_cmd;
+			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
 			//
 			// write to data logging file if needed
 			//
@@ -289,9 +296,11 @@ int main( int argc, char **argv ) {
 		 * @section Publish velocity commands
 		 */
 		#if DEBUG
-			string debugStr;
-			debugStr << "x = " << cmd_vel.linear.x << ", y = " << cmd_vel.linear.y << ", z = " << cmd_vel.linear.z;
-			Debug(debug_pub, debugStr);
+			Debug(debug_pub, "x = "+to_string(cmd_vel.linear.x)
+				+", y = "+to_string(cmd_vel.linear.y)
+				+", z = "+to_string(cmd_vel.linear.z));
+			//Debug(debug_pub, "amp = "+to_string(amp));
+			//Debug(debug_pub, "da_cmd = "+to_string(da_cmd));
 		#endif
 		//
 		// Publish
