@@ -81,7 +81,7 @@ int PTI_PWM = 0;
 double da_cmd, de_cmd, dr_cmd, dt_cmd;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	rc_input = *msg;
-	da_cmd = 2.0*(rc_input.channels[0]-1500)/796.0;
+	da_cmd = -2.0*(rc_input.channels[0]-1500)/796.0;
 	de_cmd = 2.0*(rc_input.channels[1]-1500)/796.0;
 	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
 	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
