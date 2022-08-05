@@ -47,10 +47,7 @@ const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
 // Onboard data logging (setup TODO if needed)
 //
 #define LOGDATA false
-//
-// gain
-//
-#define K 10.0
+
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -174,8 +171,6 @@ int main( int argc, char **argv ) {
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
 		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
-	ros::Publisher cmd_pos_pub = nh.advertize<geometry_msgs::PoseStamped>
-		("mavros/setpoint_position/local", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
 		("debug_pub", 10);
 	//
@@ -207,7 +202,6 @@ int main( int argc, char **argv ) {
 	// Creates the variable used to send velocity commands
 	//
 	geometry_msgs::Twist cmd_vel;
-	geometry_msgs::PoseStamped cmd_pos;
 	//
 	// send a few setpoints before starting
 	//
@@ -234,10 +228,12 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = K*amp*da_cmd;
-			cmd_vel.linear.y = K*amp*de_cmd;
+			cmd_vel.linear.x = amp*da_cmd;
+			cmd_vel.linear.y = amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0); 
-			cmd_vel.twist.angular.z = amp*dr_cmd;
+			// cmd_vel.twist.angular.x = 0.0;
+			// cmd_vel.twist.angular.y = 0.0;
+			// cmd_vel.twist.angular.z = amp*manual_input.r;
 			//
 			// Check PTI mode switch(es) here
 			//
@@ -276,10 +272,9 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = K*amp*da_cmd;
-			cmd_vel.linear.y = K*amp*de_cmd;
+			cmd_vel.linear.x = amp*da_cmd;
+			cmd_vel.linear.y = amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
-			cmd_vel.twist.angular.z = amp*dr_cmd;
 			//
 			// write to data logging file if needed
 			//
