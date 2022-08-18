@@ -207,7 +207,6 @@ int main( int argc, char **argv ) {
 	// Creates the variable used to send velocity commands
 	//
 	geometry_msgs::Twist cmd_vel;
-	geometry_msgs::PoseStamped cmd_pos;
 	//
 	// send a few setpoints before starting
 	//
@@ -237,7 +236,7 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.x = K*amp*da_cmd;
 			cmd_vel.linear.y = K*amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0); 
-			cmd_vel.twist.angular.z = amp*dr_cmd;
+			cmd_vel.angular.z = amp*dr_cmd;
 			//
 			// Check PTI mode switch(es) here
 			//
@@ -279,7 +278,7 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.x = K*amp*da_cmd;
 			cmd_vel.linear.y = K*amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
-			cmd_vel.twist.angular.z = amp*dr_cmd;
+			cmd_vel.angular.z = amp*dr_cmd;
 			//
 			// write to data logging file if needed
 			//

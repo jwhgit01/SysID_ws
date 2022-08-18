@@ -1,6 +1,6 @@
 /**
  * @author Jeremy Hopwood <jeremyhopwood@vt.edu>
- * @file vel_cmd_node.cpp
+ * @file vel_mot_excite_node.cpp
  *
  * @short TODO
  * @details TODO
@@ -29,10 +29,10 @@
  */
 //
 // CSV input file(s)
-// 	Note: first column of CSV file must be integers represiting miliseconds.
-// 	Because we use a hashmap to acess this data, the intervals may be irregular, but must be ordered.
+// 	Note: first column of CSV file must be integers representing miliseconds.
+// 	Because we use a hashmap to access this data, the intervals may be irregular, but must be ordered.
 //
-const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
+const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
 //
 // Main ROS loop rate (Hz)
 // 	This should (but need not) be greater than or equal to the
@@ -47,7 +47,10 @@ const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
 // Onboard data logging (setup TODO if needed)
 //
 #define LOGDATA false
-
+//
+// gain
+//
+#define K 10.0
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -130,7 +133,7 @@ int main( int argc, char **argv ) {
 	map<int,vector<float>> InputData;
 	load_data(InputData,file0);
 	#if DEBUG
-		ROS_INFO_STREAM("Input data map created sucessfully!");
+		ROS_INFO_STREAM("Input data map created successfully!");
 	#endif
 	//
 	// data logging file header
@@ -171,6 +174,8 @@ int main( int argc, char **argv ) {
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
 		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
+	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
+		("mavros/actuator_control", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
 		("debug_pub", 10);
 	//
@@ -199,9 +204,10 @@ int main( int argc, char **argv ) {
 		rate.sleep();
 	}
 	//
-	// Creates the variable used to send velocity commands
+	// Creates the variable used to send velocity and actuator commands
 	//
 	geometry_msgs::Twist cmd_vel;
+	mavros_msgs::ActuatorControl actuator_control;
 	//
 	// send a few setpoints before starting
 	//
@@ -228,27 +234,14 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = amp*da_cmd;
-			cmd_vel.linear.y = amp*de_cmd;
-			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0); 
-			// cmd_vel.twist.angular.x = 0.0;
-			// cmd_vel.twist.angular.y = 0.0;
-			// cmd_vel.twist.angular.z = amp*manual_input.r;
+			cmd_vel.linear.x = K*amp*da_cmd;
+			cmd_vel.linear.y = K*amp*de_cmd;
+			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
+			cmd_vel.angular.z = amp*dr_cmd;
 			//
-			// Check PTI mode switch(es) here
+			// And publish actuator controls
 			//
-			//
-			// If it is different from current, switch 
-			//
-			// if ( mode != mode_Meas ) {
-				//
-				// update the current ctrl selection
-				//
-				// mode = mode_Meas; 
-				//
-				// reset any necessary variables
-				//
-			// }
+			act_con.controls[0]
 			//
 			// If we have switched to PTI mode, capture initial conditions, etc.
 			//
@@ -272,9 +265,10 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = amp*da_cmd;
-			cmd_vel.linear.y = amp*de_cmd;
+			cmd_vel.linear.x = K*amp*da_cmd;
+			cmd_vel.linear.y = K*amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
+			cmd_vel.angular.z = amp*dr_cmd;
 			//
 			// write to data logging file if needed
 			//
