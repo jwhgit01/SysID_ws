@@ -174,8 +174,6 @@ int main( int argc, char **argv ) {
 		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
 		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
-	ros::Publisher cmd_pos_pub = nh.advertize<geometry_msgs::PoseStamped>
-		("mavros/setpoint_position/local", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
 		("debug_pub", 10);
 	//

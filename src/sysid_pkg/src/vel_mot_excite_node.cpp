@@ -40,7 +40,7 @@ const int fs = 100;
 // 	This should (but need not) be greater than or equal to the
 // 	fastest sample rate of the csv data file(s) defined above.
 //
-#define SAMPLERATE 100.0
+// #define SAMPLERATE 100.0
 //
 // Debugging mode
 //
@@ -52,7 +52,7 @@ const int fs = 100;
 //
 // gain
 //
-#define K 10.0
+#define K 5.0
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -164,7 +164,7 @@ int main( int argc, char **argv ) {
 	//
 	// Initialize the node and create the node handle
 	//
-	ros::init(argc, argv, "vel_cmd_node");
+	ros::init(argc, argv, "vel_mot_excite_node");
 	ros::NodeHandle nh;
 	//
 	// Create subscribers and publishers
@@ -198,7 +198,7 @@ int main( int argc, char **argv ) {
 	//		but may run slower if its computationally taxing.
 	//		The setpoint publishing rate MUST be faster than 2Hz.
 	//
-	ros::Rate rate(SAMPLERATE);
+	ros::Rate rate((double)fs);
 	//
 	// wait for FCU connection
 	//
@@ -320,6 +320,7 @@ int main( int argc, char **argv ) {
 		// Publish
 		//
 		cmd_vel_pub.publish(cmd_vel);
+		actuator_control_pub.publish(actuator_control);
 		//
 		// Calls any remaining callbacks
 		//
