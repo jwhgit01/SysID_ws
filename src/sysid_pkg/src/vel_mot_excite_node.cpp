@@ -33,6 +33,8 @@
 // 	Because we use a hashmap to access this data, the intervals may be irregular, but must be ordered.
 //
 const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
+const int T = 30;
+const int fs = 100;
 //
 // Main ROS loop rate (Hz)
 // 	This should (but need not) be greater than or equal to the
@@ -128,10 +130,15 @@ int main( int argc, char **argv ) {
 	//
 	bool PTI = false;
 	//
+	// initialize timestamps
+	//
+	double t0,t1;
+	//
 	// Load the CSV file into a map
 	//
 	map<int,vector<float>> InputData;
 	load_data(InputData,file0);
+	double input[4];
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created successfully!");
 	#endif
@@ -239,10 +246,6 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
 			cmd_vel.angular.z = amp*dr_cmd;
 			//
-			// And publish actuator controls
-			//
-			act_con.controls[0]
-			//
 			// If we have switched to PTI mode, capture initial conditions, etc.
 			//
 			if ( PTI_PWM > 1500 ) {
@@ -253,6 +256,10 @@ int main( int argc, char **argv ) {
 				// update PTI logical
 				// 
 				PTI =  true;
+				//
+				// capture initial time
+				//
+				t0 = ros::Time::now().toSec();
 			}
 		//
 		// If the PTI switch is ON,
@@ -269,6 +276,16 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.y = K*amp*de_cmd;
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
 			cmd_vel.angular.z = amp*dr_cmd;
+			//
+			// And publish actuator controls
+			//
+			t1 = ros::Time::now().toSec();
+			int time_idx = (int)floor((t1-t0)*(double)fs) % (T*fs);
+			input = InputData[time_idx];
+			act_con.controls[0] = input[0];
+			act_con.controls[1] = input[1];
+			act_con.controls[2] = input[2];
+			act_con.controls[3] = input[3];
 			//
 			// write to data logging file if needed
 			//
