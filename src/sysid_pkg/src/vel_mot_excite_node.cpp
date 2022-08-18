@@ -138,7 +138,7 @@ int main( int argc, char **argv ) {
 	//
 	map<int,vector<float>> InputData;
 	load_data(InputData,file0);
-	double input[4];
+	double input[4] = {0};
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created successfully!");
 	#endif
@@ -241,10 +241,10 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = K*amp*da_cmd;
-			cmd_vel.linear.y = K*amp*de_cmd;
-			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = amp*dr_cmd;
+			cmd_vel.linear.x = K*da_cmd;
+			cmd_vel.linear.y = K*de_cmd;
+			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
+			cmd_vel.angular.z = dr_cmd;
 			//
 			// If we have switched to PTI mode, capture initial conditions, etc.
 			//
@@ -272,20 +272,23 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = K*amp*da_cmd;
-			cmd_vel.linear.y = K*amp*de_cmd;
-			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = amp*dr_cmd;
+			cmd_vel.linear.x = K*da_cmd;
+			cmd_vel.linear.y = K*de_cmd;
+			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
+			cmd_vel.angular.z = dr_cmd;
 			//
 			// And publish actuator controls
 			//
 			t1 = ros::Time::now().toSec();
 			int time_idx = (int)floor((t1-t0)*(double)fs) % (T*fs);
-			input = InputData[time_idx];
-			act_con.controls[0] = input[0];
-			act_con.controls[1] = input[1];
-			act_con.controls[2] = input[2];
-			act_con.controls[3] = input[3];
+			//input = InputData[time_idx];
+			actuator_control.controls[0] = amp*InputData[time_idx][0];
+			actuator_control.controls[1] = amp*InputData[time_idx][1];
+			actuator_control.controls[2] = amp*InputData[time_idx][2];
+			actuator_control.controls[3] = amp*InputData[time_idx][3];
+			#if DEBUG
+				Debug(debug_pub, "u[0] = "+to_string(actuator_control.controls[0]));
+			#endif
 			//
 			// write to data logging file if needed
 			//
@@ -307,9 +310,9 @@ int main( int argc, char **argv ) {
 		 * @section Publish velocity commands
 		 */
 		#if DEBUG
-			Debug(debug_pub, "x = "+to_string(cmd_vel.linear.x)
-				+", y = "+to_string(cmd_vel.linear.y)
-				+", z = "+to_string(cmd_vel.linear.z));
+			//Debug(debug_pub, "x = "+to_string(cmd_vel.linear.x)
+			//	+", y = "+to_string(cmd_vel.linear.y)
+			//	+", z = "+to_string(cmd_vel.linear.z));
 			//Debug(debug_pub, "amp = "+to_string(amp));
 			//Debug(debug_pub, "da_cmd = "+to_string(da_cmd));
 		#endif
