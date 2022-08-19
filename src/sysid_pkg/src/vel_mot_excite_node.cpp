@@ -22,7 +22,7 @@
 
 #include "SysIDTools.h"
 
-// using namespace std;
+//using namespace std;
 
 /**
  * @section Parameters to configure 
@@ -136,9 +136,12 @@ int main( int argc, char **argv ) {
 	//
 	// Load the CSV file into a map
 	//
-	map<int,vector<float>> InputData;
+	std::map<int,vector<float>> InputData;
 	load_data(InputData,file0);
-	double input[4] = {0};
+	vector<float> input(4);
+	if (InputData.count(1)<1) {
+	    ROS_ERROR("Input data map not created!");
+	}
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created successfully!");
 	#endif
@@ -280,15 +283,16 @@ int main( int argc, char **argv ) {
 			// And publish actuator controls
 			//
 			t1 = ros::Time::now().toSec();
-			int time_idx = (int)floor((t1-t0)*(double)fs) % (T*fs);
-			//input = InputData[time_idx];
-			actuator_control.controls[0] = amp*InputData[time_idx][0];
-			actuator_control.controls[1] = amp*InputData[time_idx][1];
-			actuator_control.controls[2] = amp*InputData[time_idx][2];
-			actuator_control.controls[3] = amp*InputData[time_idx][3];
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs);
+			input = InputData[time_idx];
 			#if DEBUG
-				Debug(debug_pub, "u[0] = "+to_string(actuator_control.controls[0]));
+				Debug(debug_pub, "t_ms = "+to_string(time_idx));
+				Debug(debug_pub, "ms = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
 			#endif
+			actuator_control.controls[0] = input[0];
+			actuator_control.controls[1] = input[1];
+			actuator_control.controls[2] = input[2];
+			actuator_control.controls[3] = input[3];
 			//
 			// write to data logging file if needed
 			//
