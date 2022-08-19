@@ -22,8 +22,6 @@
 
 #include "SysIDTools.h"
 
-//using namespace std;
-
 /**
  * @section Parameters to configure 
  */
@@ -36,23 +34,13 @@ const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T
 const int T = 30;
 const int fs = 100;
 //
-// Main ROS loop rate (Hz)
-// 	This should (but need not) be greater than or equal to the
-// 	fastest sample rate of the csv data file(s) defined above.
-//
-// #define SAMPLERATE 100.0
-//
 // Debugging mode
 //
 #define DEBUG true
 //
-// Onboard data logging (setup TODO if needed)
-//
-#define LOGDATA false
-//
 // gain
 //
-#define K 5.0
+const double K = 5.0;
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -144,25 +132,6 @@ int main( int argc, char **argv ) {
 	}
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created successfully!");
-	#endif
-	//
-	// data logging file header
-	// 
-	// TODO: only do this once armed and close the file once disarmed.
-	//
-	#if LOGDATA
-		time_t t = time(0);   // get current time
-		struct tm * now = localtime( & t ); // current date-time for file naming
-		char buffer [80]; // 80 byte buffer
-		strftime (buffer,80,"/home/nsl/src/spincontrol_ws/logs/%F-%H-%M.csv",now); // YYYY-MM-DD-HH-MM
-		ofstream myfile; // object for data output
-		myfile.open (buffer); // open the file
-		myfile <<"t,x,y,z,phi,theta,psi,u,v,w,p,q,r,vN,vE,vD,da,de,dr,ctrlID,\n";
-		ros::Time last_request = ros::Time::now(); // why is this here?
-		//
-		// IO format for eigen objects
-		//
-		IOFormat csvfmt(StreamPrecision, DontAlignCols, ",", ",", "", "", "", "");
 	#endif
 	//
 	// Initialize the node and create the node handle
@@ -283,8 +252,8 @@ int main( int argc, char **argv ) {
 			// And publish actuator controls
 			//
 			t1 = ros::Time::now().toSec();
-			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs);
-			input = InputData[time_idx];
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs); // time index in miliseconds
+			input = InputData[time_idx]; // get vector from map
 			#if DEBUG
 				Debug(debug_pub, "t_ms = "+to_string(time_idx));
 				Debug(debug_pub, "ms = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
@@ -293,12 +262,6 @@ int main( int argc, char **argv ) {
 			actuator_control.controls[1] = input[1];
 			actuator_control.controls[2] = input[2];
 			actuator_control.controls[3] = input[3];
-			//
-			// write to data logging file if needed
-			//
-			// #if LOGDATA
-				// myfile << ros::Time::now() << "," << x.format(csvfmt) << "," << input_rad[0] << "," << input_rad[1] << "," << input_rad[2] << "," << ControlID << "\n";
-			// #endif
 			//
 			// If the PTI switch has been set back to off, set the PRI bool to false
 			//
