@@ -20,7 +20,7 @@
 #include <mavros_msgs/ActuatorControl.h>
 #include <geometry_msgs/TwistStamped.h>
 
-#include "SysIDTools.h"
+#include "sysid_tools.h"
 
 // using namespace std;
 

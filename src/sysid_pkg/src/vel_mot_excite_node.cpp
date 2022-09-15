@@ -1,9 +1,8 @@
-/**
+/**  
  * @author Jeremy Hopwood <jeremyhopwood@vt.edu>
  * @file vel_mot_excite_node.cpp
  *
- * @short TODO
- * @details TODO
+ * @short TODO* @details TODO
  * @cite DOI:TODO
  */
 
@@ -20,17 +19,18 @@
 #include <mavros_msgs/ActuatorControl.h>
 #include <geometry_msgs/TwistStamped.h>
 
-#include "SysIDTools.h"
+#include "sysid_tools.h"
 
 /**
  * @section Parameters to configure 
  */
 //
 // CSV input file(s)
+//  Note: Must use absolute filepath.
 // 	Note: first column of CSV file must be integers representing miliseconds.
 // 	Because we use a hashmap to access this data, the intervals may be irregular, but must be ordered.
 //
-const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
+const string file0 = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
 const int T = 30;
 const int fs = 100;
 //
@@ -129,6 +129,7 @@ int main( int argc, char **argv ) {
 	vector<float> input(4);
 	if (InputData.count(1)<1) {
 	    ROS_ERROR("Input data map not created!");
+	    return 0;
 	}
 	#if DEBUG
 		ROS_INFO_STREAM("Input data map created successfully!");

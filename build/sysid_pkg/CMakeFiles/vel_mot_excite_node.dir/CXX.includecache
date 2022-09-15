@@ -6,7 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/SysIDTools.h
+/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/sysid_tools.h
+iostream
+-
 vector
 -
 fstream
@@ -39,8 +41,8 @@ mavros_msgs/ActuatorControl.h
 -
 geometry_msgs/TwistStamped.h
 -
-SysIDTools.h
-/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/SysIDTools.h
+sysid_tools.h
+/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/sysid_tools.h
 
 /opt/ros/noetic/include/geometry_msgs/Twist.h
 string

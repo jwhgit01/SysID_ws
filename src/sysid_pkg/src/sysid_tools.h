@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include<iostream>
 #include<vector>
 #include<fstream>
 #include<string>
@@ -34,6 +35,7 @@ void load_data(map<int,vector<float>> &m, const string filepath) {
 		t = stoi(cell);
 		//
 		// the rest of the line is the vector of values
+		//
 		while (getline(lineStream, cell, ',')) {
 			values.push_back(stof(cell));
 		}
