@@ -157,12 +157,12 @@ int main( int argc, char **argv ) {
 	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
 		("mavros/actuator_control", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
-		("debug_pub", 10);
+		("debug", 10);
 	//
 	// check debugging topic
 	//
 	#if DEBUG
-		Debug(debug_pub, "Published to debug_pub sucessfully!");
+		Debug(debug_pub, "Published to debug sucessfully!");
 	#endif
 	//
 	// ROS rate:
@@ -256,13 +256,13 @@ int main( int argc, char **argv ) {
 			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs); // time index in miliseconds
 			input = InputData[time_idx]; // get vector from map
 			#if DEBUG
-				Debug(debug_pub, "t_ms = "+to_string(time_idx));
-				Debug(debug_pub, "ms = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
+				Debug(debug_pub, "t_ms      = "+to_string(time_idx));
+				Debug(debug_pub, "multisine = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
 			#endif
-			actuator_control.controls[0] = input[0];
-			actuator_control.controls[1] = input[1];
-			actuator_control.controls[2] = input[2];
-			actuator_control.controls[3] = input[3];
+			actuator_control.controls[0] = amp*input[0];
+			actuator_control.controls[1] = amp*input[1];
+			actuator_control.controls[2] = amp*input[2];
+			actuator_control.controls[3] = amp*input[3];
 			//
 			// If the PTI switch has been set back to off, set the PRI bool to false
 			//
@@ -278,11 +278,7 @@ int main( int argc, char **argv ) {
 		 * @section Publish velocity commands
 		 */
 		#if DEBUG
-			//Debug(debug_pub, "x = "+to_string(cmd_vel.linear.x)
-			//	+", y = "+to_string(cmd_vel.linear.y)
-			//	+", z = "+to_string(cmd_vel.linear.z));
-			//Debug(debug_pub, "amp = "+to_string(amp));
-			//Debug(debug_pub, "da_cmd = "+to_string(da_cmd));
+			Debug(debug_pub, "vel_cmd   = "+to_string(cmd_vel.linear.x)+","+to_string(cmd_vel.linear.y)+","+to_string(cmd_vel.linear.z)+","+to_string(cmd_vel.angular.z));
 		#endif
 		//
 		// Publish
