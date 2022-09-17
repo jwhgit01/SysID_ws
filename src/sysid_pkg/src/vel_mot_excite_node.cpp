@@ -219,6 +219,10 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
 			cmd_vel.angular.z = dr_cmd;
 			//
+		    // Publish
+		    //
+		    cmd_vel_pub.publish(cmd_vel);
+			//
 			// If we have switched to PTI mode, capture initial conditions, etc.
 			//
 			if ( PTI_PWM > 1500 ) {
@@ -264,6 +268,12 @@ int main( int argc, char **argv ) {
 			actuator_control.controls[2] = amp*input[2];
 			actuator_control.controls[3] = amp*input[3];
 			//
+		    // Publish
+		    // Does the order matter?
+		    //
+		    actuator_control_pub.publish(actuator_control);
+		    cmd_vel_pub.publish(cmd_vel);    
+			//
 			// If the PTI switch has been set back to off, set the PRI bool to false
 			//
 			if ( PTI_PWM <= 1500 ) {
@@ -280,11 +290,6 @@ int main( int argc, char **argv ) {
 		#if DEBUG
 			Debug(debug_pub, "vel_cmd   = "+to_string(cmd_vel.linear.x)+","+to_string(cmd_vel.linear.y)+","+to_string(cmd_vel.linear.z)+","+to_string(cmd_vel.angular.z));
 		#endif
-		//
-		// Publish
-		//
-		cmd_vel_pub.publish(cmd_vel);
-		actuator_control_pub.publish(actuator_control);
 		//
 		// Calls any remaining callbacks
 		//
