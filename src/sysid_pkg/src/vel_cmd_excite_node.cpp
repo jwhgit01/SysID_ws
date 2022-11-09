@@ -1,6 +1,6 @@
 /**  
  * @author Jeremy Hopwood <jeremyhopwood@vt.edu>
- * @file vel_mot_excite_node.cpp
+ * @file vel_cmd_excite_node.cpp
  *
  * @short TODO* @details TODO
  * @cite DOI:TODO
@@ -247,14 +247,7 @@ int main( int argc, char **argv ) {
 			//
 			//
 			//
-			// Pass through manual inputs as velocity commands with amp = m/s
-			//
-			cmd_vel.linear.x = K*da_cmd;
-			cmd_vel.linear.y = K*de_cmd;
-			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = dr_cmd;
-			//
-			// And publish actuator controls
+			// Pass exitation signal as velocity commands
 			//
 			t1 = ros::Time::now().toSec();
 			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs); // time index in miliseconds
@@ -263,15 +256,14 @@ int main( int argc, char **argv ) {
 				Debug(debug_pub, "t_ms      = "+to_string(time_idx));
 				Debug(debug_pub, "multisine = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
 			#endif
-			actuator_control.controls[0] = amp*input[0];
-			actuator_control.controls[1] = amp*input[1];
-			actuator_control.controls[2] = amp*input[2];
-			actuator_control.controls[3] = amp*input[3];
+
+			cmd_vel.linear.x = K*amp*input[0]; // K*amp m/s
+			cmd_vel.linear.y = K*amp*input[1]; // K*amp m/s
+			cmd_vel.linear.z = 0.5*K*amp*input[2]; // 0.5*K*amp m/s
+			cmd_vel.angular.z = 6*K*(3.1415926/180.0)*amp*input[3]; // 6*K*amp deg/s
 			//
 		    // Publish
-		    // Does the order matter?
 		    //
-		    actuator_control_pub.publish(actuator_control);
 		    cmd_vel_pub.publish(cmd_vel);    
 			//
 			// If the PTI switch has been set back to off, set the PRI bool to false
