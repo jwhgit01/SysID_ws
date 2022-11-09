@@ -137,7 +137,7 @@ int main( int argc, char **argv ) {
 	//
 	// Initialize the node and create the node handle
 	//
-	ros::init(argc, argv, "vel_mot_excite_node");
+	ros::init(argc, argv, "vel_cmd_excite_node");
 	ros::NodeHandle nh;
 	//
 	// Create subscribers and publishers
