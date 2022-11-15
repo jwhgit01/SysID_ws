@@ -162,6 +162,13 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
+add_executable(actuator_control_node src/actuator_control_node.cpp)
+add_dependencies(actuator_control_node ${actuator_control_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(
+  actuator_control_node
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
