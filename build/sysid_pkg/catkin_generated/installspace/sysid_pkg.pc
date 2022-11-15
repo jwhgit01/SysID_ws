@@ -1,4 +1,4 @@
-prefix=/home/nsl/src/RotorSysID_ws/install
+prefix=/home/nsl/src/SysID_ws/install
 
 Name: sysid_pkg
 Description: Description of sysid_pkg

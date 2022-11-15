@@ -48,25 +48,13 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nsl/src/RotorSysID_ws/src
+CMAKE_SOURCE_DIR = /home/nsl/src/SysID_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nsl/src/RotorSysID_ws/build
+CMAKE_BINARY_DIR = /home/nsl/src/SysID_ws/build
 
 #=============================================================================
 # Targets provided globally by CMake.
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -100,6 +88,18 @@ test:
 test/fast: test
 
 .PHONY : test/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
 
 # Special rule for the target list_install_components
 list_install_components:
@@ -137,14 +137,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/nsl/src/RotorSysID_ws/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/RotorSysID_ws/build/CMakeFiles /home/nsl/src/RotorSysID_ws/build/sysid_pkg/CMakeFiles/progress.marks
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/RotorSysID_ws/build/CMakeFiles 0
+	cd /home/nsl/src/SysID_ws/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles /home/nsl/src/SysID_ws/build/sysid_pkg/CMakeFiles/progress.marks
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/clean
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/clean
 .PHONY : clean
 
 # The main clean target
@@ -154,22 +154,37 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/preinstall
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/preinstall
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/nsl/src/RotorSysID_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/nsl/src/SysID_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
+sysid_pkg/CMakeFiles/actuator_control_node.dir/rule:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
+.PHONY : sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
+
+# Convenience name for target.
+actuator_control_node: sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
+
+.PHONY : actuator_control_node
+
+# fast build rule for target.
+actuator_control_node/fast:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/build
+.PHONY : actuator_control_node/fast
+
+# Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule
 
 # Convenience name for target.
@@ -179,27 +194,12 @@ std_msgs_generate_messages_py: sysid_pkg/CMakeFiles/std_msgs_generate_messages_p
 
 # fast build rule for target.
 std_msgs_generate_messages_py/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
 
 # Convenience name for target.
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
-.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
-
-# Convenience name for target.
-vel_cmd_excite_node: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
-
-.PHONY : vel_cmd_excite_node
-
-# fast build rule for target.
-vel_cmd_excite_node/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
-.PHONY : vel_cmd_excite_node/fast
-
-# Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
@@ -209,12 +209,12 @@ std_msgs_generate_messages_nodejs: sysid_pkg/CMakeFiles/std_msgs_generate_messag
 
 # fast build rule for target.
 std_msgs_generate_messages_nodejs/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
 .PHONY : std_msgs_generate_messages_nodejs/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
 
 # Convenience name for target.
@@ -224,12 +224,12 @@ roscpp_generate_messages_cpp: sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.
 
 # fast build rule for target.
 roscpp_generate_messages_cpp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/build
 .PHONY : roscpp_generate_messages_cpp/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/rule
 
 # Convenience name for target.
@@ -239,12 +239,12 @@ roscpp_generate_messages_eus: sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.
 
 # fast build rule for target.
 roscpp_generate_messages_eus/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/build
 .PHONY : roscpp_generate_messages_eus/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
@@ -254,12 +254,12 @@ rosgraph_msgs_generate_messages_nodejs: sysid_pkg/CMakeFiles/rosgraph_msgs_gener
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_nodejs/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
 .PHONY : rosgraph_msgs_generate_messages_nodejs/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
 
 # Convenience name for target.
@@ -269,12 +269,12 @@ std_msgs_generate_messages_lisp: sysid_pkg/CMakeFiles/std_msgs_generate_messages
 
 # fast build rule for target.
 std_msgs_generate_messages_lisp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
 .PHONY : std_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/rule
 
 # Convenience name for target.
@@ -284,12 +284,12 @@ roscpp_generate_messages_py: sysid_pkg/CMakeFiles/roscpp_generate_messages_py.di
 
 # fast build rule for target.
 roscpp_generate_messages_py/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build
 .PHONY : roscpp_generate_messages_py/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
 
 # Convenience name for target.
@@ -299,12 +299,12 @@ std_msgs_generate_messages_eus: sysid_pkg/CMakeFiles/std_msgs_generate_messages_
 
 # fast build rule for target.
 std_msgs_generate_messages_eus/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 .PHONY : std_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
@@ -314,12 +314,12 @@ roscpp_generate_messages_nodejs: sysid_pkg/CMakeFiles/roscpp_generate_messages_n
 
 # fast build rule for target.
 roscpp_generate_messages_nodejs/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/build
 .PHONY : roscpp_generate_messages_nodejs/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
 
 # Convenience name for target.
@@ -329,12 +329,12 @@ rosgraph_msgs_generate_messages_cpp: sysid_pkg/CMakeFiles/rosgraph_msgs_generate
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_cpp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
 
 # Convenience name for target.
@@ -344,12 +344,12 @@ std_msgs_generate_messages_cpp: sysid_pkg/CMakeFiles/std_msgs_generate_messages_
 
 # fast build rule for target.
 std_msgs_generate_messages_cpp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
 .PHONY : std_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
 
 # Convenience name for target.
@@ -359,12 +359,12 @@ rosgraph_msgs_generate_messages_eus: sysid_pkg/CMakeFiles/rosgraph_msgs_generate
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_eus/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build
 .PHONY : rosgraph_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
 
 # Convenience name for target.
@@ -374,27 +374,12 @@ rosgraph_msgs_generate_messages_lisp: sysid_pkg/CMakeFiles/rosgraph_msgs_generat
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_lisp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
-sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
-.PHONY : sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
-
-# Convenience name for target.
-vel_cmd_node: sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
-
-.PHONY : vel_cmd_node
-
-# fast build rule for target.
-vel_cmd_node/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/build
-.PHONY : vel_cmd_node/fast
-
-# Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
 
 # Convenience name for target.
@@ -404,12 +389,12 @@ roscpp_generate_messages_lisp: sysid_pkg/CMakeFiles/roscpp_generate_messages_lis
 
 # fast build rule for target.
 roscpp_generate_messages_lisp/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/build
 .PHONY : roscpp_generate_messages_lisp/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
 
 # Convenience name for target.
@@ -419,62 +404,35 @@ rosgraph_msgs_generate_messages_py: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_py/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
-src/vel_cmd_excite_node.o: src/vel_cmd_excite_node.cpp.o
+src/actuator_control_node.o: src/actuator_control_node.cpp.o
 
-.PHONY : src/vel_cmd_excite_node.o
-
-# target to build an object file
-src/vel_cmd_excite_node.cpp.o:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o
-.PHONY : src/vel_cmd_excite_node.cpp.o
-
-src/vel_cmd_excite_node.i: src/vel_cmd_excite_node.cpp.i
-
-.PHONY : src/vel_cmd_excite_node.i
-
-# target to preprocess a source file
-src/vel_cmd_excite_node.cpp.i:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.i
-.PHONY : src/vel_cmd_excite_node.cpp.i
-
-src/vel_cmd_excite_node.s: src/vel_cmd_excite_node.cpp.s
-
-.PHONY : src/vel_cmd_excite_node.s
-
-# target to generate assembly for a file
-src/vel_cmd_excite_node.cpp.s:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.s
-.PHONY : src/vel_cmd_excite_node.cpp.s
-
-src/vel_cmd_node.o: src/vel_cmd_node.cpp.o
-
-.PHONY : src/vel_cmd_node.o
+.PHONY : src/actuator_control_node.o
 
 # target to build an object file
-src/vel_cmd_node.cpp.o:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.o
-.PHONY : src/vel_cmd_node.cpp.o
+src/actuator_control_node.cpp.o:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.o
+.PHONY : src/actuator_control_node.cpp.o
 
-src/vel_cmd_node.i: src/vel_cmd_node.cpp.i
+src/actuator_control_node.i: src/actuator_control_node.cpp.i
 
-.PHONY : src/vel_cmd_node.i
+.PHONY : src/actuator_control_node.i
 
 # target to preprocess a source file
-src/vel_cmd_node.cpp.i:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.i
-.PHONY : src/vel_cmd_node.cpp.i
+src/actuator_control_node.cpp.i:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.i
+.PHONY : src/actuator_control_node.cpp.i
 
-src/vel_cmd_node.s: src/vel_cmd_node.cpp.s
+src/actuator_control_node.s: src/actuator_control_node.cpp.s
 
-.PHONY : src/vel_cmd_node.s
+.PHONY : src/actuator_control_node.s
 
 # target to generate assembly for a file
-src/vel_cmd_node.cpp.s:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.s
-.PHONY : src/vel_cmd_node.cpp.s
+src/actuator_control_node.cpp.s:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.s
+.PHONY : src/actuator_control_node.cpp.s
 
 # Help Target
 help:
@@ -482,12 +440,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... install/local"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... test"
+	@echo "... install/local"
+	@echo "... actuator_control_node"
 	@echo "... std_msgs_generate_messages_py"
-	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
@@ -503,15 +461,11 @@ help:
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
-	@echo "... vel_cmd_node"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... src/vel_cmd_excite_node.o"
-	@echo "... src/vel_cmd_excite_node.i"
-	@echo "... src/vel_cmd_excite_node.s"
-	@echo "... src/vel_cmd_node.o"
-	@echo "... src/vel_cmd_node.i"
-	@echo "... src/vel_cmd_node.s"
+	@echo "... src/actuator_control_node.o"
+	@echo "... src/actuator_control_node.i"
+	@echo "... src/actuator_control_node.s"
 .PHONY : help
 
 
@@ -523,6 +477,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/nsl/src/RotorSysID_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/nsl/src/SysID_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

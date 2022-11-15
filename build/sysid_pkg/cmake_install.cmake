@@ -1,8 +1,8 @@
-# Install script for directory: /home/nsl/src/RotorSysID_ws/src/sysid_pkg
+# Install script for directory: /home/nsl/src/SysID_ws/src/sysid_pkg
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/nsl/src/RotorSysID_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/nsl/src/SysID_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/nsl/src/RotorSysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkg.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/nsl/src/SysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkg.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/sysid_pkg/cmake" TYPE FILE FILES
-    "/home/nsl/src/RotorSysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkgConfig.cmake"
-    "/home/nsl/src/RotorSysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkgConfig-version.cmake"
+    "/home/nsl/src/SysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkgConfig.cmake"
+    "/home/nsl/src/SysID_ws/build/sysid_pkg/catkin_generated/installspace/sysid_pkgConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/sysid_pkg" TYPE FILE FILES "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/sysid_pkg" TYPE FILE FILES "/home/nsl/src/SysID_ws/src/sysid_pkg/package.xml")
 endif()
 

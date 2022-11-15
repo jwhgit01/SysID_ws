@@ -134,7 +134,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/sysid_pkg_node.cpp)
-add_executable(vel_cmd_node src/vel_cmd_node.cpp)
+# add_executable(vel_cmd_node src/vel_cmd_node.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -146,21 +146,21 @@ add_executable(vel_cmd_node src/vel_cmd_node.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(vel_cmd_node ${vel_cmd_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(vel_cmd_node ${vel_cmd_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(
-  vel_cmd_node
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(
+#   vel_cmd_node
+#   ${catkin_LIBRARIES}
+# )
 
-add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
-add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(
-  vel_cmd_excite_node
-  ${catkin_LIBRARIES}
-)
+# add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
+# add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(
+#   vel_cmd_excite_node
+#   ${catkin_LIBRARIES}
+# )
 
 add_executable(actuator_control_node src/actuator_control_node.cpp)
 add_dependencies(actuator_control_node ${actuator_control_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

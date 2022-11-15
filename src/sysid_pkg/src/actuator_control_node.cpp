@@ -25,24 +25,20 @@
 /**
  * @section Parameters to configure 
  */
-//
-// Debugging mode
-//
+
+/* Debugging mode */
 #define DEBUG true
-//
-// This text file should constain the list a desired CSV input file(s).
-// Lines beginning with "#" will be ignored. Note: first column of a 
-// CSV file must be integers represiting miliseconds. Because we use
-// a hashmap to acess this data, the intervals may be irregular, but
-// must be ordered.
-//
-const string signal_list = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/signal_list.txt";
+
+/* This text file should constain the list a desired CSV input file.
+ * The firsyt line that does not begin with '#' will be taken as the 
+ * filename of the desired input signal located in csv_dir. The first
+ * column of the files in csv_dir must be integers represiting
+ * miliseconds. Because we use a hashmap to acess this data, the
+ * intervals may be irregular, but must be ordered.
+ */
+const string csv_dir = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/";
+const string signal_list = "signal_list.txt";
 const int fs = 100;
-const int time_gap = 3;
-//
-// gain
-//
-const double K = 5.0;
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -58,18 +54,16 @@ void Debug( ros::Publisher debug_pub, string info_str ) {
 /**
  * @section Callback functions that get data from the relevant MAVROS topic
  */
-//
-// State of pixhawk e.g. armed/disarmed, connected, etc.
-// ~state (mavros_msgs/State)
-//
+
+/* State of pixhawk e.g. armed/disarmed, connected, etc.
+ * ~state (mavros_msgs/State) */
 mavros_msgs::State current_state;
 void state_cb( const mavros_msgs::State::ConstPtr& msg ) {
 	current_state = *msg;
 }
-//
-// RC inputs (in raw milliseconds)
-// ~rc/in (mavros_msgs/RCIn)
-//
+
+/* RC inputs (in raw milliseconds)
+ * ~rc/in (mavros_msgs/RCIn) */
 mavros_msgs::RCIn rc_input;
 double amp = 0.0;
 int PTI_PWM = 0;
@@ -83,29 +77,12 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	PTI_PWM = rc_input.channels[6];
 	amp = 1.0*(rc_input.channels[9]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 }
-//
-// RC Rx, interpreted and normalized.
-// ~manual_control/control (mavros_msgs/ManualControl)
-//
-mavros_msgs::ManualControl manual_input;
-void manual_cb( const mavros_msgs::ManualControl::ConstPtr& msg ) {
-	manual_input = *msg;
-}
-//
-// Velocity data from FCU.
-// ~local_position/velocity (geometry_msgs/TwistStamped)
-//
-geometry_msgs::TwistStamped body_vel_data;
-void body_vel_cb( const geometry_msgs::TwistStamped::ConstPtr& msg ) {
-	body_vel_data = *msg;
-}
-//
-// Velocity fused by FCU.
-// ~global_position/gp_vel (geometry_msgs/TwistStamped)
-//
-geometry_msgs::TwistStamped inert_vel_data;
-void inert_vel_cb( const geometry_msgs::TwistStamped::ConstPtr& msg ) {
-	inert_vel_data = *msg;
+
+/* RC Rx, interpreted and normalized.
+ * ~manual_control/control (mavros_msgs/ManualControl) */
+mavros_msgs::ManualControl manual_control;
+void manual_control_cb( const mavros_msgs::ManualControl::ConstPtr& msg ) {
+	manual_control = *msg;
 }
 
 /**
@@ -115,80 +92,54 @@ int main( int argc, char **argv ) {
 	/**
 	 * @section Initialize variables and ROS node
 	 */
-	//
-	// Get the list of input CSVs
-	//
-	vector<string> signals = which_signals(signal_list);
-	//
-	// Load the CSV file(s) into a map
-	//
-	int t_start = 0;
+
+	/* Get the input CSV from the signal list and load it into a map. Also,
+	 * determine the final time of the signal along with the nuumber of inputs.
+	 */
+	string signal = which_signal(csv_dir+signal_list);
 	map<int,vector<float>> InputData;
-	for (size_t i = 0; i < signals.size(); i++) {
-		//
-		// Determine the start time in miliseconds of the next signal
-		//
-		std::vector<int> keys;
-    	for (auto j = InputData.begin(); j != InputData.end(); j++) {
-        	keys.push_back(j->first);
-    	}
-		t_start = (i>0)*( i*fs*time_gap + *std::max_element(keys.begin(), keys.end()) );
-		//
-		// Load the CSV data into the map
-		//
-		load_data(InputData, signals[i], t_start);
+	load_data(InputData, csv_dir+signal);
+	int T_ms = 0;
+	if (!InputData.empty()) {
+    	int T_ms = std::prev(InputData.end())->first;
 	}
-	//
-	// Determine the final time of the input signal in milliseconds
-	//
-	int T_ms = std::max_element(keys.begin(), keys.end());
-	//
-	// Initialize the phase of any switches
-	//
+	int m = (InputData[0]).size();
+
+	/* Initialize variables for use in main loop */
+	vector<float> input(m);
 	bool PTI = false;
-	//
-	// initialize timestamps
-	//
 	double t0, t1;
-	//
-	// Initialize the node and create the node handle
-	//
+
+	/*Initialize the node and create the node handle */
 	ros::init(argc, argv, "actuator_control_node");
 	ros::NodeHandle nh;
-	//
-	// Create subscribers and publishers
-	//
+	
+	/* Create subscribers and publishers */
 	ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
 		("mavros/state", 1, state_cb);
 	ros::Subscriber rc_in_sub = nh.subscribe<mavros_msgs::RCIn>
 		("mavros/rc/in", 1, rcin_cb);
-	ros::Subscriber manual_in_sub = nh.subscribe<mavros_msgs::ManualControl>
-		("mavros/manual_control/control", 1, manual_cb);
-	ros::Subscriber body_vel_sub = nh.subscribe<geometry_msgs::TwistStamped>
-		("mavros/local_position/velocity_body", 1, body_vel_cb);
-	ros::Subscriber inert_vel_sub = nh.subscribe<geometry_msgs::TwistStamped>
-		("mavros/local_posiiton/velocity_local", 1, inert_vel_cb);
+	ros::Subscriber manual_control_sub = nh.subscribe<mavros_msgs::ManualControl>
+		("mavros/manual_control/control", 1, manual_control_cb);
 	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
 		("mavros/actuator_control", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
 		("debug_pub", 10);
-	//
-	// check debugging topic
-	//
+		
+	/* Double check debugging topic */
 	#if DEBUG
 		Debug(debug_pub, "Published to debug_pub sucessfully!");
 	#endif
-	//
-	// ROS rate:
-	// 		Defines the rate at which the control loop runs.
-	//		Note that the code will not run faster than this rate,
-	//		but may run slower if its computationally taxing.
-	//		The setpoint publishing rate MUST be faster than 2Hz.
-	//
+
+	/* ROS rate:
+	 *		Defines the rate at which the control loop runs. Note that the code
+	 * 		will not run faster than this rate, but may run slower if it is
+	 *		computationally taxing. The setpoint publishing rate MUST be faster
+	 * 		than 2Hz.
+	 */
 	ros::Rate rate( (double)fs );
-	//
-	// wait for FCU connection
-	//
+	
+	/* wait for FCU connection */
 	while ( ros::ok() && !current_state.connected ) {
 		ROS_INFO_STREAM("Waiting!");
 		#if DEBUG
@@ -197,13 +148,11 @@ int main( int argc, char **argv ) {
 		ros::spinOnce();
 		rate.sleep();
 	}
-	//
-	// Creates the variable used to send velocity commands
-	//
+
+	/* Create the variable used to send actuator controls */
 	mavros_msgs::ActuatorControl actuator_control;
-	//
-	// send a few setpoints before starting
-	//
+	
+	/* Send a few setpoints before starting */
 	for (int i = 100; ros::ok() && i > 0; --i) {
 		ros::spinOnce();
 		rate.sleep();
@@ -217,61 +166,53 @@ int main( int argc, char **argv ) {
 	 * @details While everything is okay, loop at the specified rate, SAMPLERATE
 	 */
 	while (ros::ok()) {
-		/**
-		 * @section Check the PTI switch
-		 */
-		//
-		// If the PTI switch it OFF,
-		//
+		
+		/* If the PTI switch it OFF, pass through manual inputs */
 		if (!PTI) {
-			//
-			// Pass through manual inputs as velocity commands with amp = m/s
-			//
-			actuator_control.controls[0] = da_cmd;
-			actuator_control.controls[1] = de_cmd;
-			actuator_control.controls[2] = (2.0*dt_cmd-1.0);
-			actuator_control.controls[3] = dr_cmd;
-			//
-			// If we have switched to PTI mode, capture initial conditions, etc.
-			//
+			
+			/* Populate actuator controls from the manual inputs */
+			actuator_control.controls[0] = manual_control.x; // Aileron
+			actuator_control.controls[1] = manual_control.y; // Elevator
+			actuator_control.controls[2] = manual_control.r; // Rudder
+			actuator_control.controls[3] = manual_control.z; // Throttle
+			
+			/* If we have switched to PTI mode, capture initial conditions */
 			if ( PTI_PWM > 1500 ) {
 				#if DEBUG
 					Debug(debug_pub, "PTI On");
 				#endif
-				//
-				// update PTI logical
-				// 
 				PTI =  true;
-				//
-				// capture initial time
-				//
 				t0 = ros::Time::now().toSec();
 			}
-		//
-		// If the PTI switch is ON,
-		//
+		
+		/* If the PTI switch is on, send excited actuator controls */
 		} else { 
-			//
-			// Read the current state of the aircraft if necessary...
-			//
-			//
-			//
-			// Pass exitation signal as velocity commands
-			//
+
+			/* Compute the time index in miliseconds */
 			t1 = ros::Time::now().toSec();
-			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T_ms; // time index in miliseconds
-			input = InputData[time_idx]; // get vector from map
-			#if DEBUG
-				Debug(debug_pub, "t_ms      = "+to_string(time_idx));
-				Debug(debug_pub, "multisine = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
-			#endif
-			actuator_control.controls[0] = da_cmd + amp*input[0];
-			actuator_control.controls[1] = de_cmd + amp*input[1];
-			actuator_control.controls[2] = (2.0*(dt_cmd + amp*input[2]) - 1.0);
-			actuator_control.controls[3] = dr_cmd + amp*input[3];
-			//
-			// If the PTI switch has been set back to off, set the PRI bool to false
-			//
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T_ms;
+			
+			/* Get the input vector from the map */
+			input = InputData[time_idx];
+			
+			/* If it is a 3-axis input, dont excite throttle */
+			if (m < 4) {
+				input[4] = 0.0;
+			}
+			
+			/* Populate the actuator controls with the manual inputs
+			 * plus the excitation signal. If it is a 3-axis input, don't
+			 * excite throttle. */
+			actuator_control.controls[0] = manual_control.x + amp*input[0]; // Aileron
+			actuator_control.controls[1] = manual_control.y + amp*input[1]; // Elevator
+			actuator_control.controls[2] = manual_control.r + amp*input[2]; // Rudder
+			if (m < 4) {
+				actuator_control.controls[3] = manual_control.z; // Throttle
+			} else {
+				actuator_control.controls[3] = manual_control.z + amp*input[3]; // Throttle
+			}
+	
+			/* f the PTI switch has been set to off, set the PTI to false */
 			if ( PTI_PWM <= 1500 ) {
 				#if DEBUG
 					Debug(debug_pub, "PTI Off");
@@ -279,24 +220,13 @@ int main( int argc, char **argv ) {
 				PTI = false;
 			}
 		}
+
+		/* Publish */
+		actuator_control_pub.publish(actuator_control);
 		
-		/**
-		 * @section Publish velocity commands
-		 */
-		#if DEBUG
-			// TODO
-		#endif
-		//
-		// Publish
-		//
-		cmd_vel_pub.publish(cmd_vel);
-		//
-		// Calls any remaining callbacks
-		//
+		/* Calls any remaining callbacks and sleep for a period of time based
+		 * on the ROS rate defined. */
 		ros::spinOnce();
-		//
-		// Sleep for a period of time based on the ROS rate defined
-		//
 		rate.sleep();
 	}
 

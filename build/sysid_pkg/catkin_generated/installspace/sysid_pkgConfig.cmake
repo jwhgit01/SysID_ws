@@ -67,14 +67,14 @@ set(sysid_pkg_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(sysid_pkg_SOURCE_PREFIX /home/nsl/src/RotorSysID_ws/src/sysid_pkg)
-  set(sysid_pkg_DEVEL_PREFIX /home/nsl/src/RotorSysID_ws/devel)
+  set(sysid_pkg_SOURCE_PREFIX /home/nsl/src/SysID_ws/src/sysid_pkg)
+  set(sysid_pkg_DEVEL_PREFIX /home/nsl/src/SysID_ws/devel)
   set(sysid_pkg_INSTALL_PREFIX "")
   set(sysid_pkg_PREFIX ${sysid_pkg_DEVEL_PREFIX})
 else()
   set(sysid_pkg_SOURCE_PREFIX "")
   set(sysid_pkg_DEVEL_PREFIX "")
-  set(sysid_pkg_INSTALL_PREFIX /home/nsl/src/RotorSysID_ws/install)
+  set(sysid_pkg_INSTALL_PREFIX /home/nsl/src/SysID_ws/install)
   set(sysid_pkg_PREFIX ${sysid_pkg_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/nsl/src/RotorSysID_ws/install/lib;/opt/ros/noetic/lib)
+    foreach(path /home/nsl/src/SysID_ws/install/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

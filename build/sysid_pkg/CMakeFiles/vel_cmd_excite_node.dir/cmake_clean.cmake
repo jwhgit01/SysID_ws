@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/nsl/src/RotorSysID_ws/devel/lib/sysid_pkg/vel_cmd_excite_node"
-  "/home/nsl/src/RotorSysID_ws/devel/lib/sysid_pkg/vel_cmd_excite_node.pdb"
+  "/home/nsl/src/SysID_ws/devel/lib/sysid_pkg/vel_cmd_excite_node"
+  "/home/nsl/src/SysID_ws/devel/lib/sysid_pkg/vel_cmd_excite_node.pdb"
   "CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o"
 )
 

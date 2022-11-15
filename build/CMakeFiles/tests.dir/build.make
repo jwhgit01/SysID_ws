@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nsl/src/RotorSysID_ws/src
+CMAKE_SOURCE_DIR = /home/nsl/src/SysID_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nsl/src/RotorSysID_ws/build
+CMAKE_BINARY_DIR = /home/nsl/src/SysID_ws/build
 
 # Utility rule file for tests.
 
@@ -67,6 +67,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /home/nsl/src/RotorSysID_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nsl/src/RotorSysID_ws/src /home/nsl/src/RotorSysID_ws/src /home/nsl/src/RotorSysID_ws/build /home/nsl/src/RotorSysID_ws/build /home/nsl/src/RotorSysID_ws/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/nsl/src/SysID_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nsl/src/SysID_ws/src /home/nsl/src/SysID_ws/src /home/nsl/src/SysID_ws/build /home/nsl/src/SysID_ws/build /home/nsl/src/SysID_ws/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 

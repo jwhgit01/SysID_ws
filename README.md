@@ -1,2 +1,2 @@
-# RotorSysID_ws
-ROS workspace for multi-rotor system identification
+# SysID_ws
+ROS workspace for fixed-wing and multi-rotor system identification

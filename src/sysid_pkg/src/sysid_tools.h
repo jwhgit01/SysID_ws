@@ -16,7 +16,7 @@ using namespace std;
  * @short Read input data from CSV and place in a map
  * @details First column of CSV must be integers represting miliseconds
  */
-void load_data(map<int,vector<float>> &m, const string filepath, int startTime) {
+void load_data(map<int,vector<float>> &m, const string filepath) {
 	//
 	// read data from CSV file
 	//
@@ -32,7 +32,7 @@ void load_data(map<int,vector<float>> &m, const string filepath, int startTime) 
 		// get the first "cell" as the time
 		//
 		getline(lineStream, cell, ',');
-		t = stoi(cell) + startTime;
+		t = stoi(cell);
 		//
 		// the rest of the line is the vector of values
 		//
@@ -48,20 +48,21 @@ void load_data(map<int,vector<float>> &m, const string filepath, int startTime) 
 }
 
 /**
- * @short Read the desired input signals from a text file
+ * @short Read the desired input signal from a text file
+ * @details This function reads the file line by line and 
+ *          sets the signal filename to be the first line 
+ *          which does not start with "#".
  */
-vector<string> signals = which_signals(const string filepath) {
+string which_signal(string filepath) {
 	ifstream indata;
 	indata.open(filepath);
 	string line;
-	vector<string> signals;
 	while (getline(indata, line)) {
 		stringstream lineStream(line);
 		string cell;
-		if (line[0] != "#")
-		{
-			signals.push_back(line);
+		if (line[0] != '#'){
+			return line;
 		}
 	}
-	return;
+	return "\0";
 }

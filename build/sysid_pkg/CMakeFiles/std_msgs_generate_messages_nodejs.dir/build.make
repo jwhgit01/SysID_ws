@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/nsl/src/RotorSysID_ws/src
+CMAKE_SOURCE_DIR = /home/nsl/src/SysID_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/nsl/src/RotorSysID_ws/build
+CMAKE_BINARY_DIR = /home/nsl/src/SysID_ws/build
 
 # Utility rule file for std_msgs_generate_messages_nodejs.
 
@@ -63,10 +63,10 @@ sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build: std_msgs_gener
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
 
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean:
-	cd /home/nsl/src/RotorSysID_ws/build/sysid_pkg && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
+	cd /home/nsl/src/SysID_ws/build/sysid_pkg && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_nodejs.dir/cmake_clean.cmake
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean
 
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/depend:
-	cd /home/nsl/src/RotorSysID_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nsl/src/RotorSysID_ws/src /home/nsl/src/RotorSysID_ws/src/sysid_pkg /home/nsl/src/RotorSysID_ws/build /home/nsl/src/RotorSysID_ws/build/sysid_pkg /home/nsl/src/RotorSysID_ws/build/sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/nsl/src/SysID_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/nsl/src/SysID_ws/src /home/nsl/src/SysID_ws/src/sysid_pkg /home/nsl/src/SysID_ws/build /home/nsl/src/SysID_ws/build/sysid_pkg /home/nsl/src/SysID_ws/build/sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/depend
 

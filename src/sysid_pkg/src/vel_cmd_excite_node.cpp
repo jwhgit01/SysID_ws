@@ -127,7 +127,7 @@ int main( int argc, char **argv ) {
 	// Load the CSV file into a map
 	//
 	std::map<int,vector<float>> InputData;
-	load_data(InputData, file0, 0);
+	load_data(InputData, file0);
 	vector<float> input(4);
 	if (InputData.count(1)<1) {
 	    ROS_ERROR("Input data map not created!");
