@@ -2,7 +2,8 @@
  * @author Jeremy Hopwood <jeremyhopwood@vt.edu>
  * @file vel_cmd_excite_node.cpp
  *
- * @short TODO* @details TODO
+ * @short TODO
+ * @details TODO
  * @cite DOI:TODO
  */
 
@@ -25,18 +26,19 @@
  * @section Parameters to configure 
  */
 //
+// Debugging mode
+//
+#define DEBUG true
+//
 // CSV input file(s)
-//  Note: Must use absolute filepath.
-// 	Note: first column of CSV file must be integers representing miliseconds.
-// 	Because we use a hashmap to access this data, the intervals may be irregular, but must be ordered.
+// Note: Must use absolute filepath.
+// Note: first column of CSV file must be integers representing miliseconds.
+// Because we use a hashmap to access this data, the
+// intervals may be irregular, but must be ordered.
 //
 const string file0 = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
 const int T = 30;
 const int fs = 100;
-//
-// Debugging mode
-//
-#define DEBUG true
 //
 // gain
 //
@@ -120,12 +122,12 @@ int main( int argc, char **argv ) {
 	//
 	// initialize timestamps
 	//
-	double t0,t1;
+	double t0, t1;
 	//
 	// Load the CSV file into a map
 	//
 	std::map<int,vector<float>> InputData;
-	load_data(InputData,file0);
+	load_data(InputData, file0, 0);
 	vector<float> input(4);
 	if (InputData.count(1)<1) {
 	    ROS_ERROR("Input data map not created!");
@@ -214,10 +216,10 @@ int main( int argc, char **argv ) {
 			//
 			// Pass through manual inputs as velocity commands with amp = m/s
 			//
-			cmd_vel.linear.x = K*da_cmd;
-			cmd_vel.linear.y = K*de_cmd;
-			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = dr_cmd;
+			cmd_vel.linear.x = K*amp*da_cmd;
+			cmd_vel.linear.y = K*amp*de_cmd;
+			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
+			cmd_vel.angular.z = amp*dr_cmd;
 			//
 		    // Publish
 		    //

@@ -22,35 +22,27 @@
 
 #include "sysid_tools.h"
 
-// using namespace std;
-
 /**
  * @section Parameters to configure 
  */
-//
-// CSV input file(s)
-// 	Note: first column of CSV file must be integers represiting miliseconds.
-// 	Because we use a hashmap to acess this data, the intervals may be irregular, but must be ordered.
-//
-const string file0 = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/test.csv";
-//
-// Main ROS loop rate (Hz)
-// 	This should (but need not) be greater than or equal to the
-// 	fastest sample rate of the csv data file(s) defined above.
-//
-#define SAMPLERATE 100.0
 //
 // Debugging mode
 //
 #define DEBUG true
 //
-// Onboard data logging (setup TODO if needed)
+// This text file should constain the list a desired CSV input file(s).
+// Lines beginning with "#" will be ignored. Note: first column of a 
+// CSV file must be integers represiting miliseconds. Because we use
+// a hashmap to acess this data, the intervals may be irregular, but
+// must be ordered.
 //
-#define LOGDATA false
+const string signal_list = "~/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/signal_list.txt";
+const int fs = 100;
+const int time_gap = 3;
 //
 // gain
 //
-#define K 10.0
+const double K = 5.0;
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
@@ -124,36 +116,40 @@ int main( int argc, char **argv ) {
 	 * @section Initialize variables and ROS node
 	 */
 	//
-	// Initialize the phase of the switches
+	// Get the list of input CSVs
+	//
+	vector<string> signals = which_signals(signal_list);
+	//
+	// Load the CSV file(s) into a map
+	//
+	int t_start = 0;
+	map<int,vector<float>> InputData;
+	for (size_t i = 0; i < signals.size(); i++) {
+		//
+		// Determine the start time in miliseconds of the next signal
+		//
+		std::vector<int> keys;
+    	for (auto j = InputData.begin(); j != InputData.end(); j++) {
+        	keys.push_back(j->first);
+    	}
+		t_start = (i>0)*( i*fs*time_gap + *std::max_element(keys.begin(), keys.end()) );
+		//
+		// Load the CSV data into the map
+		//
+		load_data(InputData, signals[i], t_start);
+	}
+	//
+	// Determine the final time of the input signal in milliseconds
+	//
+	int T_ms = std::max_element(keys.begin(), keys.end());
+	//
+	// Initialize the phase of any switches
 	//
 	bool PTI = false;
 	//
-	// Load the CSV file into a map
+	// initialize timestamps
 	//
-	map<int,vector<float>> InputData;
-	load_data(InputData,file0);
-	#if DEBUG
-		ROS_INFO_STREAM("Input data map created sucessfully!");
-	#endif
-	//
-	// data logging file header
-	// 
-	// TODO: only do this once armed and close the file once disarmed.
-	//
-	#if LOGDATA
-		time_t t = time(0);   // get current time
-		struct tm * now = localtime( & t ); // current date-time for file naming
-		char buffer [80]; // 80 byte buffer
-		strftime (buffer,80,"/home/nsl/src/spincontrol_ws/logs/%F-%H-%M.csv",now); // YYYY-MM-DD-HH-MM
-		ofstream myfile; // object for data output
-		myfile.open (buffer); // open the file
-		myfile <<"t,x,y,z,phi,theta,psi,u,v,w,p,q,r,vN,vE,vD,da,de,dr,ctrlID,\n";
-		ros::Time last_request = ros::Time::now(); // why is this here?
-		//
-		// IO format for eigen objects
-		//
-		IOFormat csvfmt(StreamPrecision, DontAlignCols, ",", ",", "", "", "", "");
-	#endif
+	double t0, t1;
 	//
 	// Initialize the node and create the node handle
 	//
@@ -189,7 +185,7 @@ int main( int argc, char **argv ) {
 	//		but may run slower if its computationally taxing.
 	//		The setpoint publishing rate MUST be faster than 2Hz.
 	//
-	ros::Rate rate(SAMPLERATE);
+	ros::Rate rate( (double)fs );
 	//
 	// wait for FCU connection
 	//
@@ -236,21 +232,6 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0); 
 			cmd_vel.angular.z = amp*dr_cmd;
 			//
-			// Check PTI mode switch(es) here
-			//
-			//
-			// If it is different from current, switch 
-			//
-			// if ( mode != mode_Meas ) {
-				//
-				// update the current ctrl selection
-				//
-				// mode = mode_Meas; 
-				//
-				// reset any necessary variables
-				//
-			// }
-			//
 			// If we have switched to PTI mode, capture initial conditions, etc.
 			//
 			if ( PTI_PWM > 1500 ) {
@@ -261,6 +242,10 @@ int main( int argc, char **argv ) {
 				// update PTI logical
 				// 
 				PTI =  true;
+				//
+				// capture initial time
+				//
+				t0 = ros::Time::now().toSec();
 			}
 		//
 		// If the PTI switch is ON,
@@ -271,18 +256,19 @@ int main( int argc, char **argv ) {
 			//
 			//
 			//
-			// Pass through manual inputs as velocity commands with amp = m/s
+			// Pass exitation signal as velocity commands
 			//
-			cmd_vel.linear.x = K*amp*da_cmd;
-			cmd_vel.linear.y = K*amp*de_cmd;
-			cmd_vel.linear.z = amp*(2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = amp*dr_cmd;
-			//
-			// write to data logging file if needed
-			//
-			// #if LOGDATA
-				// myfile << ros::Time::now() << "," << x.format(csvfmt) << "," << input_rad[0] << "," << input_rad[1] << "," << input_rad[2] << "," << ControlID << "\n";
-			// #endif
+			t1 = ros::Time::now().toSec();
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T_ms; // time index in miliseconds
+			input = InputData[time_idx]; // get vector from map
+			#if DEBUG
+				Debug(debug_pub, "t_ms      = "+to_string(time_idx));
+				Debug(debug_pub, "multisine = "+to_string(input[0])+","+to_string(input[1])+","+to_string(input[2])+","+to_string(input[3]));
+			#endif
+			cmd_vel.linear.x = K*amp*input[0]; // K*amp m/s
+			cmd_vel.linear.y = K*amp*input[1]; // K*amp m/s
+			cmd_vel.linear.z = 0.5*K*amp*input[2]; // 0.5*K*amp m/s
+			cmd_vel.angular.z = 6*K*(3.1415926/180.0)*amp*input[3]; // 6*K*amp deg/s
 			//
 			// If the PTI switch has been set back to off, set the PRI bool to false
 			//
