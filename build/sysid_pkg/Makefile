@@ -183,6 +183,21 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+# Convenience name for target.
+vel_cmd_excite_node: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+.PHONY : vel_cmd_excite_node
+
+# fast build rule for target.
+vel_cmd_excite_node/fast:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
+.PHONY : vel_cmd_excite_node/fast
+
+# Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
 	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
@@ -271,21 +286,6 @@ roscpp_generate_messages_py: sysid_pkg/CMakeFiles/roscpp_generate_messages_py.di
 roscpp_generate_messages_py/fast:
 	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build
 .PHONY : roscpp_generate_messages_py/fast
-
-# Convenience name for target.
-sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/rule:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/rule
-.PHONY : sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/rule
-
-# Convenience name for target.
-vel_mot_excite_node: sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/rule
-
-.PHONY : vel_mot_excite_node
-
-# fast build rule for target.
-vel_mot_excite_node/fast:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build
-.PHONY : vel_mot_excite_node/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/rule:
@@ -378,6 +378,21 @@ rosgraph_msgs_generate_messages_lisp/fast:
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
+sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
+.PHONY : sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
+
+# Convenience name for target.
+vel_cmd_node: sysid_pkg/CMakeFiles/vel_cmd_node.dir/rule
+
+.PHONY : vel_cmd_node
+
+# fast build rule for target.
+vel_cmd_node/fast:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/build
+.PHONY : vel_cmd_node/fast
+
+# Convenience name for target.
 sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule:
 	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
@@ -407,32 +422,59 @@ rosgraph_msgs_generate_messages_py/fast:
 	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
-src/vel_mot_excite_node.o: src/vel_mot_excite_node.cpp.o
+src/vel_cmd_excite_node.o: src/vel_cmd_excite_node.cpp.o
 
-.PHONY : src/vel_mot_excite_node.o
+.PHONY : src/vel_cmd_excite_node.o
 
 # target to build an object file
-src/vel_mot_excite_node.cpp.o:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/src/vel_mot_excite_node.cpp.o
-.PHONY : src/vel_mot_excite_node.cpp.o
+src/vel_cmd_excite_node.cpp.o:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o
+.PHONY : src/vel_cmd_excite_node.cpp.o
 
-src/vel_mot_excite_node.i: src/vel_mot_excite_node.cpp.i
+src/vel_cmd_excite_node.i: src/vel_cmd_excite_node.cpp.i
 
-.PHONY : src/vel_mot_excite_node.i
+.PHONY : src/vel_cmd_excite_node.i
 
 # target to preprocess a source file
-src/vel_mot_excite_node.cpp.i:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/src/vel_mot_excite_node.cpp.i
-.PHONY : src/vel_mot_excite_node.cpp.i
+src/vel_cmd_excite_node.cpp.i:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.i
+.PHONY : src/vel_cmd_excite_node.cpp.i
 
-src/vel_mot_excite_node.s: src/vel_mot_excite_node.cpp.s
+src/vel_cmd_excite_node.s: src/vel_cmd_excite_node.cpp.s
 
-.PHONY : src/vel_mot_excite_node.s
+.PHONY : src/vel_cmd_excite_node.s
 
 # target to generate assembly for a file
-src/vel_mot_excite_node.cpp.s:
-	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/src/vel_mot_excite_node.cpp.s
-.PHONY : src/vel_mot_excite_node.cpp.s
+src/vel_cmd_excite_node.cpp.s:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.s
+.PHONY : src/vel_cmd_excite_node.cpp.s
+
+src/vel_cmd_node.o: src/vel_cmd_node.cpp.o
+
+.PHONY : src/vel_cmd_node.o
+
+# target to build an object file
+src/vel_cmd_node.cpp.o:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.o
+.PHONY : src/vel_cmd_node.cpp.o
+
+src/vel_cmd_node.i: src/vel_cmd_node.cpp.i
+
+.PHONY : src/vel_cmd_node.i
+
+# target to preprocess a source file
+src/vel_cmd_node.cpp.i:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.i
+.PHONY : src/vel_cmd_node.cpp.i
+
+src/vel_cmd_node.s: src/vel_cmd_node.cpp.s
+
+.PHONY : src/vel_cmd_node.s
+
+# target to generate assembly for a file
+src/vel_cmd_node.cpp.s:
+	cd /home/nsl/src/RotorSysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/src/vel_cmd_node.cpp.s
+.PHONY : src/vel_cmd_node.cpp.s
 
 # Help Target
 help:
@@ -445,6 +487,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... test"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
@@ -453,7 +496,6 @@ help:
 	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_py"
 	@echo "... install"
-	@echo "... vel_mot_excite_node"
 	@echo "... std_msgs_generate_messages_eus"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
@@ -461,11 +503,15 @@ help:
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
+	@echo "... vel_cmd_node"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... src/vel_mot_excite_node.o"
-	@echo "... src/vel_mot_excite_node.i"
-	@echo "... src/vel_mot_excite_node.s"
+	@echo "... src/vel_cmd_excite_node.o"
+	@echo "... src/vel_cmd_excite_node.i"
+	@echo "... src/vel_cmd_excite_node.s"
+	@echo "... src/vel_cmd_node.o"
+	@echo "... src/vel_cmd_node.i"
+	@echo "... src/vel_cmd_node.s"
 .PHONY : help
 
 

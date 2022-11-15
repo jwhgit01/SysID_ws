@@ -298,6 +298,19 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named vel_cmd_excite_node
+
+# Build rule for target.
+vel_cmd_excite_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vel_cmd_excite_node
+.PHONY : vel_cmd_excite_node
+
+# fast build rule for target.
+vel_cmd_excite_node/fast:
+	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
+.PHONY : vel_cmd_excite_node/fast
+
+#=============================================================================
 # Target rules for targets named std_msgs_generate_messages_nodejs
 
 # Build rule for target.
@@ -374,19 +387,6 @@ roscpp_generate_messages_py: cmake_check_build_system
 roscpp_generate_messages_py/fast:
 	$(MAKE) -f sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/build
 .PHONY : roscpp_generate_messages_py/fast
-
-#=============================================================================
-# Target rules for targets named vel_mot_excite_node
-
-# Build rule for target.
-vel_mot_excite_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 vel_mot_excite_node
-.PHONY : vel_mot_excite_node
-
-# fast build rule for target.
-vel_mot_excite_node/fast:
-	$(MAKE) -f sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_mot_excite_node.dir/build
-.PHONY : vel_mot_excite_node/fast
 
 #=============================================================================
 # Target rules for targets named std_msgs_generate_messages_eus
@@ -467,6 +467,19 @@ rosgraph_msgs_generate_messages_lisp/fast:
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named vel_cmd_node
+
+# Build rule for target.
+vel_cmd_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vel_cmd_node
+.PHONY : vel_cmd_node
+
+# fast build rule for target.
+vel_cmd_node/fast:
+	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_node.dir/build
+.PHONY : vel_cmd_node/fast
+
+#=============================================================================
 # Target rules for targets named roscpp_generate_messages_lisp
 
 # Build rule for target.
@@ -515,19 +528,20 @@ help:
 	@echo "... gtest_main"
 	@echo "... gtest"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_nodejs"
 	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_py"
-	@echo "... vel_mot_excite_node"
 	@echo "... std_msgs_generate_messages_eus"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
+	@echo "... vel_cmd_node"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
 .PHONY : help

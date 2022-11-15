@@ -18,7 +18,7 @@ string
 map
 -
 
-/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/vel_cmd_node.cpp
+/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/vel_cmd_excite_node.cpp
 vector
 -
 fstream
