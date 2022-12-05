@@ -1,0 +1,3 @@
+[submodule "src/sysid_pkg/lib/eigen"]
+	path = src/sysid_pkg/lib/eigen
+	url = https://gitlab.com/libeigen/eigen.git
