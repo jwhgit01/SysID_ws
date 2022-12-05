@@ -102,7 +102,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS lib
 #  LIBRARIES sysid_pkg
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
@@ -155,19 +155,19 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-# add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
-# add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(
-#   vel_cmd_excite_node
-#   ${catkin_LIBRARIES}
-# )
-
-add_executable(actuator_control_node src/actuator_control_node.cpp)
-add_dependencies(actuator_control_node ${actuator_control_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
+add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
-  actuator_control_node
+  vel_cmd_excite_node
   ${catkin_LIBRARIES}
 )
+
+#add_executable(actuator_control_node src/actuator_control_node.cpp)
+#add_dependencies(actuator_control_node ${actuator_control_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(
+#  actuator_control_node
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
