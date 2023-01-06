@@ -68,17 +68,22 @@ void state_cb( const mavros_msgs::State::ConstPtr& msg ) {
 mavros_msgs::RCIn rc_input;
 double amp = 0.0;
 int PTI_PWM = 0;
-unsigned int vel = 0;
+// unsigned int vel = 0;
 double mag = 0;
-double dir = 0;
+// double dir = 0;
+unsigned int a,b;
 double da_cmd, de_cmd, dr_cmd, dt_cmd;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	rc_input = *msg;
 	da_cmd = -2.0*(rc_input.channels[0]-1500)/796.0;
-	de_cmd = 2.0*(rc_input.channels[1]-1500)/796.0;
+	de_cmd = -2.0*(rc_input.channels[1]-1500)/796.0;
 	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
 	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
 	PTI_PWM = rc_input.channels[6];
+	//
+	// OLD
+	//
+	/*
 	if (rc_input.channels[7] > 1666) {
 		vel = 2;
 	} else if (rc_input.channels[7] > 1333) {
@@ -97,6 +102,29 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 		dir = 1.0;
 	} else {
 		dir = -1.0;
+	}
+	*/
+	//
+	// New 
+	//
+	if (rc_input.channels[7] > 1666) {
+		a = 2;
+	} else if (rc_input.channels[7] > 1333) {
+		a = 1;
+	} else {
+		a = 0;
+	}
+	if (rc_input.channels[8] > 1666) {
+		b = 2;
+	} else if (rc_input.channels[8] > 1333) {
+		b = 1;
+	} else {
+		b = 0;
+	}
+	if (rc_input.channels[9] > 1500) {
+		mag = 10.0;
+	} else {
+		mag = 5.0;
 	}
 	amp = 1.0*(rc_input.channels[10]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 }
@@ -241,8 +269,27 @@ int main( int argc, char **argv ) {
 		} else { 
 			
 			// Get body velocity commands from aucillary rc switches.
-			vb_ref << 0.0, 0.0, 0.0;
-			vb_ref(vel) = dir*mag;
+			// vb_ref << 0.0, 0.0, 0.0;
+			// vb_ref(vel) = dir*mag;
+			if (a==-1 && b==-1) {
+				vb_ref << -mag, -mag, -mag;
+			} else if (a==0 && b==-1) {
+				vb_ref << +mag, -mag, -mag;
+			} else if (a==1 && b==-1) {
+				vb_ref << -mag, +mag, -mag;
+			} else if (a==-1 && b==0) {
+				vb_ref << +mag, +mag, -mag;
+			} else if (a==0 && b==0) {
+				vb_ref << -mag, -mag, +mag;
+			} else if (a==1 && b==0) {
+				vb_ref << +mag, -mag, +mag;
+			} else if (a==-1 && b==1) {
+				vb_ref << -mag, +mag, +mag;
+			} else if (a==0 && b==1) {
+				vb_ref << +mag, +mag, +mag;
+			} else {
+				vb_ref << 0.0, 0.0, 0.0;
+			}
 
 			// Convert body velocity commands to the NED frame.
 			q0 = imu_data.orientation;
