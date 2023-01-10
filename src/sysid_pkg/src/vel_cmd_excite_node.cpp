@@ -108,18 +108,18 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	// New 
 	//
 	if (rc_input.channels[7] > 1666) {
-		a = 2;
-	} else if (rc_input.channels[7] > 1333) {
 		a = 1;
-	} else {
+	} else if (rc_input.channels[7] > 1333) {
 		a = 0;
+	} else {
+		a = -1;
 	}
 	if (rc_input.channels[8] > 1666) {
-		b = 2;
-	} else if (rc_input.channels[8] > 1333) {
 		b = 1;
-	} else {
+	} else if (rc_input.channels[8] > 1333) {
 		b = 0;
+	} else {
+		b = -1;
 	}
 	if (rc_input.channels[9] > 1500) {
 		mag = 10.0;
