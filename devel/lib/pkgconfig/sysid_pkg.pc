@@ -3,6 +3,6 @@ prefix=/home/nsl/src/SysID_ws/devel
 Name: sysid_pkg
 Description: Description of sysid_pkg
 Version: 0.0.0
-Cflags: 
+Cflags: -I/home/nsl/src/SysID_ws/src/sysid_pkg/lib
 Libs: -L${prefix}/lib 
 Requires: 

@@ -56,6 +56,18 @@ CMAKE_BINARY_DIR = /home/nsl/src/SysID_ws/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -88,18 +100,6 @@ test:
 test/fast: test
 
 .PHONY : test/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
 
 # Special rule for the target list_install_components
 list_install_components:
@@ -168,21 +168,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-sysid_pkg/CMakeFiles/actuator_control_node.dir/rule:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
-.PHONY : sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
-
-# Convenience name for target.
-actuator_control_node: sysid_pkg/CMakeFiles/actuator_control_node.dir/rule
-
-.PHONY : actuator_control_node
-
-# fast build rule for target.
-actuator_control_node/fast:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/build
-.PHONY : actuator_control_node/fast
-
-# Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/rule
@@ -196,6 +181,21 @@ std_msgs_generate_messages_py: sysid_pkg/CMakeFiles/std_msgs_generate_messages_p
 std_msgs_generate_messages_py/fast:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
+
+# Convenience name for target.
+sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+# Convenience name for target.
+vel_cmd_excite_node: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+.PHONY : vel_cmd_excite_node
+
+# fast build rule for target.
+vel_cmd_excite_node/fast:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
+.PHONY : vel_cmd_excite_node/fast
 
 # Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
@@ -407,32 +407,32 @@ rosgraph_msgs_generate_messages_py/fast:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
-src/actuator_control_node.o: src/actuator_control_node.cpp.o
+src/vel_cmd_excite_node.o: src/vel_cmd_excite_node.cpp.o
 
-.PHONY : src/actuator_control_node.o
+.PHONY : src/vel_cmd_excite_node.o
 
 # target to build an object file
-src/actuator_control_node.cpp.o:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.o
-.PHONY : src/actuator_control_node.cpp.o
+src/vel_cmd_excite_node.cpp.o:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o
+.PHONY : src/vel_cmd_excite_node.cpp.o
 
-src/actuator_control_node.i: src/actuator_control_node.cpp.i
+src/vel_cmd_excite_node.i: src/vel_cmd_excite_node.cpp.i
 
-.PHONY : src/actuator_control_node.i
+.PHONY : src/vel_cmd_excite_node.i
 
 # target to preprocess a source file
-src/actuator_control_node.cpp.i:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.i
-.PHONY : src/actuator_control_node.cpp.i
+src/vel_cmd_excite_node.cpp.i:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.i
+.PHONY : src/vel_cmd_excite_node.cpp.i
 
-src/actuator_control_node.s: src/actuator_control_node.cpp.s
+src/vel_cmd_excite_node.s: src/vel_cmd_excite_node.cpp.s
 
-.PHONY : src/actuator_control_node.s
+.PHONY : src/vel_cmd_excite_node.s
 
 # target to generate assembly for a file
-src/actuator_control_node.cpp.s:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/src/actuator_control_node.cpp.s
-.PHONY : src/actuator_control_node.cpp.s
+src/vel_cmd_excite_node.cpp.s:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.s
+.PHONY : src/vel_cmd_excite_node.cpp.s
 
 # Help Target
 help:
@@ -440,12 +440,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... install/local"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... test"
-	@echo "... install/local"
-	@echo "... actuator_control_node"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
@@ -463,9 +463,9 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... src/actuator_control_node.o"
-	@echo "... src/actuator_control_node.i"
-	@echo "... src/actuator_control_node.s"
+	@echo "... src/vel_cmd_excite_node.o"
+	@echo "... src/vel_cmd_excite_node.i"
+	@echo "... src/vel_cmd_excite_node.s"
 .PHONY : help
 
 

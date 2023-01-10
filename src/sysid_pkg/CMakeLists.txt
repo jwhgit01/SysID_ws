@@ -117,6 +117,7 @@ catkin_package(
 include_directories(
   # include
   src
+  lib/eigen
   ${catkin_INCLUDE_DIRS}
 )
 

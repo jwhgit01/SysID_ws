@@ -285,19 +285,6 @@ gtest/fast:
 .PHONY : gtest/fast
 
 #=============================================================================
-# Target rules for targets named actuator_control_node
-
-# Build rule for target.
-actuator_control_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 actuator_control_node
-.PHONY : actuator_control_node
-
-# fast build rule for target.
-actuator_control_node/fast:
-	$(MAKE) -f sysid_pkg/CMakeFiles/actuator_control_node.dir/build.make sysid_pkg/CMakeFiles/actuator_control_node.dir/build
-.PHONY : actuator_control_node/fast
-
-#=============================================================================
 # Target rules for targets named std_msgs_generate_messages_py
 
 # Build rule for target.
@@ -309,6 +296,19 @@ std_msgs_generate_messages_py: cmake_check_build_system
 std_msgs_generate_messages_py/fast:
 	$(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named vel_cmd_excite_node
+
+# Build rule for target.
+vel_cmd_excite_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vel_cmd_excite_node
+.PHONY : vel_cmd_excite_node
+
+# fast build rule for target.
+vel_cmd_excite_node/fast:
+	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
+.PHONY : vel_cmd_excite_node/fast
 
 #=============================================================================
 # Target rules for targets named std_msgs_generate_messages_nodejs
@@ -514,8 +514,8 @@ help:
 	@echo "... gmock"
 	@echo "... gtest_main"
 	@echo "... gtest"
-	@echo "... actuator_control_node"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"

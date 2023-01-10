@@ -6,5 +6,5 @@ CXX_FLAGS =
 
 CXX_DEFINES = -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"sysid_pkg\"
 
-CXX_INCLUDES = -I/home/nsl/src/SysID_ws/src/sysid_pkg/src -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp 
+CXX_INCLUDES = -I/home/nsl/src/SysID_ws/src/sysid_pkg/src -I/home/nsl/src/SysID_ws/src/sysid_pkg/lib/eigen -I/opt/ros/noetic/include -I/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp 
 

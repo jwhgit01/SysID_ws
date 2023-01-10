@@ -3,6 +3,7 @@
 
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /home/nsl/src/SysID_ws/src/sysid_pkg/src/sysid_tools.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /home/nsl/src/SysID_ws/src/sysid_pkg/src/vel_cmd_excite_node.cpp
+sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Quaternion.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Twist.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/TwistStamped.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Vector3.h
@@ -66,6 +67,7 @@ sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/ros/wall_timer.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/ros/wall_timer_options.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/rosconsole/macros_generated.h
+sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/Imu.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/std_msgs/String.h
 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
