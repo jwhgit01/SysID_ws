@@ -152,9 +152,12 @@ int main( int argc, char **argv ) {
 	 */
 	// Initialize variables
 	bool PTI = false;
-	double t0, t1;
+	int ExcitePhase = 0;
+	double t, t0, t1;
 	geometry_msgs::Quaternion q0;
 	Eigen::Vector3d vb_ref;
+	Eigen::Vector3d vb_cmd;
+	Eigen::Vector3d delta_vb;
 	Eigen::Vector3d vi_ref;
 	Eigen::Vector3d vb_ms;
 	Eigen::Vector3d vi_ms;
@@ -261,8 +264,9 @@ int main( int argc, char **argv ) {
 				// update PTI logical
 				PTI =  true;
 	
-				// capture initial time
-				t0 = ros::Time::now().toSec();
+				// Set initial velocity reference to zero
+				vb_cmd << 0.0, 0.0, 0.0;
+				ExcitePhase = 1;
 			}
 
 		// If the PTI switch is ON,
@@ -291,18 +295,51 @@ int main( int argc, char **argv ) {
 				vb_ref << 0.0, 0.0, 0.0;
 			}
 
+			// Check the phase of the excitation maneuever
+			switch (ExcitePhase) {
+			
+				// Ramp Phase
+				case 1 
+					// Increment the velocity reference from zero
+					delta_vb = 0.005*vb_ref; // at 100Hz this is a 2 second ramp
+					vb_cmd = vb_cmd + delta_vb;
+					vi_ms << 0.0, 0.0, 0.0;
+					if (abs(vb_cmd(1)) >= mag) {
+						ExcitePhase = 2;
+						t0 = ros::Time::now().toSec();
+					}
+					break;
+				
+				// Stready Motion Phase
+				case 2
+					vb_cmd = vb_ref;
+					vi_ms << 0.0, 0.0, 0.0;
+					t = ros::Time::now().toSec();
+					if (t-t0 >= 3.0) {
+						ExcitePhase = 3;
+						t1 = ros::Time::now().toSec();
+					}
+				
+				// Multisine Phase
+				case 3
+					t = ros::Time::now().toSec();
+					int time_idx = (int)(floor((t-t1)*(double)fs)) % (T*fs); // time index in miliseconds
+					ms = InputData[time_idx]; // get vector from map
+					vb_ms << ms[0], ms[1], ms[2]; // get velocity components
+					vi_ms = R_IB*vb_ms; // transform to NED frame
+
+				default:
+					vb_ref << 0.0, 0.0, 0.0;
+					vi_ms << 0.0, 0.0, 0.0;
+					ExcitePhase = 0;
+					break;
+			}
+
 			// Convert body velocity commands to the NED frame.
 			q0 = imu_data.orientation;
 			Eigen::Quaterniond q1(q0.w, q0.x, q0.y, q0.z);
 			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
-			vi_ref = R_IB*vb_ref;
-
-			// Also convert multisine commands to the NED frame.
-			t1 = ros::Time::now().toSec();
-			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs); // time index in miliseconds
-			ms = InputData[time_idx]; // get vector from map
-			vb_ms << ms[0], ms[1], ms[2]; // get velocity components
-			vi_ms = R_IB*vb_ms; // transform to NED frame
+			vi_ref = R_IB*vb_cmd;
 
 			// Assemble velocity commands.
 			cmd_vel.linear.x = amp*vi_ms(0) + vi_ref(0);
@@ -316,6 +353,7 @@ int main( int argc, char **argv ) {
 					Debug(debug_pub, "PTI Off");
 				#endif
 				PTI = false;
+				ExcitePhase = 0;
 			}
 		}
 		
