@@ -155,12 +155,13 @@ int main( int argc, char **argv ) {
 	int ExcitePhase = 0;
 	double t, t0, t1;
 	geometry_msgs::Quaternion q0;
+	Eigen::Vector3d vb_ss;
 	Eigen::Vector3d vb_ref;
-	Eigen::Vector3d vb_cmd;
 	Eigen::Vector3d delta_vb;
 	Eigen::Vector3d vi_ref;
 	Eigen::Vector3d vb_ms;
 	Eigen::Vector3d vi_ms;
+	int time_idx = 0;
 	vector<float> ms(4);
 	vector<float> input(4);
 
@@ -241,13 +242,13 @@ int main( int argc, char **argv ) {
 
 			// Get body velocity commands from rc inputs.
 			// However, keep the verical command in the inertial frame.
-			vb_ref << da_cmd, de_cmd, 0.0;
+			vb_ss << da_cmd, de_cmd, 0.0;
 
 			// Convert body velocity commands to the NED frame.
 			q0 = imu_data.orientation;
 			Eigen::Quaterniond q1(q0.w, q0.x, q0.y, q0.z);
 			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
-			vi_ref = R_IB*vb_ref;
+			vi_ref = R_IB*vb_ss;
 
 			// Pass through manual inputs as velocity commands.
 			cmd_vel.linear.x = vi_ref(0);
@@ -265,68 +266,83 @@ int main( int argc, char **argv ) {
 				PTI =  true;
 	
 				// Set initial velocity reference to zero
-				vb_cmd << 0.0, 0.0, 0.0;
+				vb_ref << 0.0, 0.0, 0.0;
 				ExcitePhase = 1;
 			}
 
 		// If the PTI switch is ON,
 		} else { 
+		
+		    // Get the rotation matrix from the body frame to the inertial frame.
+			q0 = imu_data.orientation;
+			Eigen::Quaterniond q1(q0.w, q0.x, q0.y, q0.z);
+			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
 			
 			// Get body velocity commands from aucillary rc switches.
-			// vb_ref << 0.0, 0.0, 0.0;
-			// vb_ref(vel) = dir*mag;
+			// vb_ss << 0.0, 0.0, 0.0;
+			// vb_ss(vel) = dir*mag;
 			if (a==-1 && b==-1) {
-				vb_ref << -mag, -mag, -mag;
+				vb_ss << -mag, -mag, -mag;
 			} else if (a==0 && b==-1) {
-				vb_ref << +mag, -mag, -mag;
+				vb_ss << +mag, -mag, -mag;
 			} else if (a==1 && b==-1) {
-				vb_ref << -mag, +mag, -mag;
+				vb_ss << -mag, +mag, -mag;
 			} else if (a==-1 && b==0) {
-				vb_ref << +mag, +mag, -mag;
+				vb_ss << +mag, +mag, -mag;
 			} else if (a==0 && b==0) {
-				vb_ref << -mag, -mag, +mag;
+				vb_ss << -mag, -mag, +mag;
 			} else if (a==1 && b==0) {
-				vb_ref << +mag, -mag, +mag;
+				vb_ss << +mag, -mag, +mag;
 			} else if (a==-1 && b==1) {
-				vb_ref << -mag, +mag, +mag;
+				vb_ss << -mag, +mag, +mag;
 			} else if (a==0 && b==1) {
-				vb_ref << +mag, +mag, +mag;
+				vb_ss << +mag, +mag, +mag;
 			} else {
-				vb_ref << 0.0, 0.0, 0.0;
+				vb_ss << 0.0, 0.0, 0.0;
 			}
 
 			// Check the phase of the excitation maneuever
 			switch (ExcitePhase) {
 			
 				// Ramp Phase
-				case 1 
+				case 1:
 					// Increment the velocity reference from zero
-					delta_vb = 0.005*vb_ref; // at 100Hz this is a 2 second ramp
-					vb_cmd = vb_cmd + delta_vb;
+					delta_vb = 0.005*vb_ss; // at 100Hz this is a 2 second ramp
+					vb_ref = vb_ref + delta_vb;
 					vi_ms << 0.0, 0.0, 0.0;
-					if (abs(vb_cmd(1)) >= mag) {
+					if (abs(vb_ref(1)) >= mag) {
 						ExcitePhase = 2;
 						t0 = ros::Time::now().toSec();
 					}
 					break;
 				
 				// Stready Motion Phase
-				case 2
-					vb_cmd = vb_ref;
+				case 2:
+					vb_ref = vb_ss;
 					vi_ms << 0.0, 0.0, 0.0;
 					t = ros::Time::now().toSec();
 					if (t-t0 >= 3.0) {
 						ExcitePhase = 3;
 						t1 = ros::Time::now().toSec();
 					}
+					break;
 				
 				// Multisine Phase
-				case 3
+				case 3:
+				    vb_ref = vb_ss;
 					t = ros::Time::now().toSec();
-					int time_idx = (int)(floor((t-t1)*(double)fs)) % (T*fs); // time index in miliseconds
+					time_idx = (int)(floor((t-t1)*(double)fs)) % (T*fs); // time index in miliseconds
 					ms = InputData[time_idx]; // get vector from map
 					vb_ms << ms[0], ms[1], ms[2]; // get velocity components
 					vi_ms = R_IB*vb_ms; // transform to NED frame
+					
+					// End multisine after 15 seconds
+					if (t-t1 >= 15.0) {
+					    vb_ref << 0.0, 0.0, 0.0;
+					    vi_ms << 0.0, 0.0, 0.0;
+					    ExcitePhase = 0;
+					}
+					break;
 
 				default:
 					vb_ref << 0.0, 0.0, 0.0;
@@ -336,10 +352,7 @@ int main( int argc, char **argv ) {
 			}
 
 			// Convert body velocity commands to the NED frame.
-			q0 = imu_data.orientation;
-			Eigen::Quaterniond q1(q0.w, q0.x, q0.y, q0.z);
-			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
-			vi_ref = R_IB*vb_cmd;
+			vi_ref = R_IB*vb_ref;
 
 			// Assemble velocity commands.
 			cmd_vel.linear.x = amp*vi_ms(0) + vi_ref(0);
