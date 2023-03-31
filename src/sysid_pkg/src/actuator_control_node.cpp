@@ -41,19 +41,6 @@ const string signal_list = "signal_list.txt";
 const int fs = 100; // sampling rate of the input signal
 
 /**
- * @brief Fucntion for publishing debugging info to debug_pub
- * @details This function is useful with remote debugging, such as 
- *          ssh'ing into the co-computer during flight.
- */
-void Debug( ros::Publisher debug_pub, string info_str ) {
-	std_msgs::String msg;
-	std:stringstream ss;
-	ss << info_str;
-	msg.data = ss.str();
-	debug_pub.publish(msg);
-}
-
-/**
  * @section Callback functions that get data from the relevant MAVROS topic
  */
 
@@ -210,7 +197,7 @@ int main( int argc, char **argv ) {
 			actuator_control.controls[2] = manual_control.r + amp*input[2]; // Rudder
 			actuator_control.controls[3] = manual_control.z + amp*input[3]; // Throttle
 	
-			/* f the PTI switch has been set to LOW, set exit from PTI mode */
+			/* If the PTI switch has been set to LOW, set exit from PTI mode */
 			if ( PTI_PWM <= 1500 ) {
 				#if DEBUG
 					Debug(debug_pub, "PTI Off");
