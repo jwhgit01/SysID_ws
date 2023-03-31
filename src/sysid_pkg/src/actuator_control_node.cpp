@@ -29,19 +29,21 @@
 /* Debugging mode */
 #define DEBUG true
 
-/* This text file should constain the list a desired CSV input file.
- * The firsyt line that does not begin with '#' will be taken as the 
+/* This text file should constain a list of desired CSV input files.
+ * The first line that does not begin with '#' will be taken as the 
  * filename of the desired input signal located in csv_dir. The first
  * column of the files in csv_dir must be integers represiting
  * miliseconds. Because we use a hashmap to acess this data, the
  * intervals may be irregular, but must be ordered.
  */
-const string csv_dir = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/";
+const string csv_dir = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/"; // absolute path
 const string signal_list = "signal_list.txt";
-const int fs = 100;
+const int fs = 100; // sampling rate of the input signal
 
 /**
  * @brief Fucntion for publishing debugging info to debug_pub
+ * @details This function is useful with remote debugging, such as 
+ *          ssh'ing into the co-computer during flight.
  */
 void Debug( ros::Publisher debug_pub, string info_str ) {
 	std_msgs::String msg;
@@ -89,6 +91,7 @@ void manual_control_cb( const mavros_msgs::ManualControl::ConstPtr& msg ) {
  * @short Main ROS function
  */
 int main( int argc, char **argv ) {
+	
 	/**
 	 * @section Initialize variables and ROS node
 	 */
@@ -131,15 +134,14 @@ int main( int argc, char **argv ) {
 		Debug(debug_pub, "Published to debug_pub sucessfully!");
 	#endif
 
-	/* ROS rate:
-	 *		Defines the rate at which the control loop runs. Note that the code
-	 * 		will not run faster than this rate, but may run slower if it is
-	 *		computationally taxing. The setpoint publishing rate MUST be faster
-	 * 		than 2Hz.
+	/* Defines the rate at which the control loop runs. Note that the code
+	 * will not run faster than this rate, but may run slower if it is
+	 * computationally taxing. The setpoint publishing rate MUST be faster
+	 * than 2Hz.
 	 */
 	ros::Rate rate( (double)fs );
 	
-	/* wait for FCU connection */
+	/* Wait for FCU connection */
 	while ( ros::ok() && !current_state.connected ) {
 		ROS_INFO_STREAM("Waiting!");
 		#if DEBUG
@@ -163,11 +165,11 @@ int main( int argc, char **argv ) {
 
 	/**
 	 * @brief Main loop
-	 * @details While everything is okay, loop at the specified rate, SAMPLERATE
+	 * @details While everything is okay, loop at the specified rate, fs
 	 */
 	while (ros::ok()) {
 		
-		/* If the PTI switch it OFF, pass through manual inputs */
+		/* If the we are not in PTI mode, pass through manual inputs */
 		if (!PTI) {
 			
 			/* Populate actuator controls from the manual inputs */
@@ -176,7 +178,7 @@ int main( int argc, char **argv ) {
 			actuator_control.controls[2] = manual_control.r; // Rudder
 			actuator_control.controls[3] = manual_control.z; // Throttle
 			
-			/* If we have switched to PTI mode, capture initial conditions */
+			/* If we have switched to PTI switch to HIGH, capture initial conditions */
 			if ( PTI_PWM > 1500 ) {
 				#if DEBUG
 					Debug(debug_pub, "PTI On");
@@ -185,7 +187,7 @@ int main( int argc, char **argv ) {
 				t0 = ros::Time::now().toSec();
 			}
 		
-		/* If the PTI switch is on, send excited actuator controls */
+		/* If the we are in PTI mode, send excited actuator controls */
 		} else { 
 
 			/* Compute the time index in miliseconds */
@@ -197,7 +199,7 @@ int main( int argc, char **argv ) {
 			
 			/* If it is a 3-axis input, dont excite throttle */
 			if (m < 4) {
-				input[4] = 0.0;
+				input[3] = 0.0;
 			}
 			
 			/* Populate the actuator controls with the manual inputs
@@ -206,13 +208,9 @@ int main( int argc, char **argv ) {
 			actuator_control.controls[0] = manual_control.x + amp*input[0]; // Aileron
 			actuator_control.controls[1] = manual_control.y + amp*input[1]; // Elevator
 			actuator_control.controls[2] = manual_control.r + amp*input[2]; // Rudder
-			if (m < 4) {
-				actuator_control.controls[3] = manual_control.z; // Throttle
-			} else {
-				actuator_control.controls[3] = manual_control.z + amp*input[3]; // Throttle
-			}
+			actuator_control.controls[3] = manual_control.z + amp*input[3]; // Throttle
 	
-			/* f the PTI switch has been set to off, set the PTI to false */
+			/* f the PTI switch has been set to LOW, set exit from PTI mode */
 			if ( PTI_PWM <= 1500 ) {
 				#if DEBUG
 					Debug(debug_pub, "PTI Off");
@@ -221,7 +219,7 @@ int main( int argc, char **argv ) {
 			}
 		}
 
-		/* Publish */
+		/* Publish the actuator controls */
 		actuator_control_pub.publish(actuator_control);
 		
 		/* Calls any remaining callbacks and sleep for a period of time based
