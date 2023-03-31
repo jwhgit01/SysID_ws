@@ -20,8 +20,6 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/Imu.h>
 
-#include <Eigen/Dense>
-
 #include "sysid_tools.h"
 
 using namespace std;
@@ -29,17 +27,17 @@ using namespace std;
 /**
  * @short Read control gain data from CSV
  */
-void load_control_gains(vector<Eigen::MatrixXd> &Ki, const string filepath, const int num_rows, const int num_cols) {
+template <typename MatrixType, int NumRows, int NumCols>
+void load_control_gains(vector<MatrixType> &Ki, const string filepath) {
 
 	// read data from CSV file and store in large matrix
-	MatrixXd BigK = loadMatrix(filepath);
+	Eigen::MatrixXd BigK = loadMatrix(filepath);
 	int nv = Ki.size();
 
 	// Get each Ki,
 	for (int i = 0; i < nv; i++) {
-		Ki[i] = BigK.block<num_rows,num_cols>(0,i*num_cols);
+		Ki[i] = BigK.block<NumRows,NumCols>(0,i*NumCols);
 	}
-
 	return;
 	
 }
@@ -47,10 +45,11 @@ void load_control_gains(vector<Eigen::MatrixXd> &Ki, const string filepath, cons
 /**
  * @short polydec 
  */
-Eigen::MatrixXd polydec(const vector<Eigen::MatrixXd> &Mi, const vector<Eigen::Vector3d> &pi, Eigen::Vector3d p) {
+Eigen::MatrixXd polydec(const vector<Eigen::MatrixXd> &Mi, const vector<Eigen::VectorXd> &pi, Eigen::VectorXd p) {
 
-	/* Get the number of vertices */
+	/* Get the number of vertices and parameters */
 	int nv = Mi.size();
+	int np = p.size();
 
 	/* Initialize the result */
     int rows = Mi[0].rows();
@@ -59,13 +58,16 @@ Eigen::MatrixXd polydec(const vector<Eigen::MatrixXd> &Mi, const vector<Eigen::V
 	M.setZero();
 
 	/* Find parameter bounds. */
-    Eigen::Vector3d pmin, pmax;
+    Eigen::VectorXd pmin(np);
+	Eigen::VectorXd pmax(np);
     pmin.setConstant(numeric_limits<double>::lowest());
 	pmax.setConstant(numeric_limits<double>::lowest());
     for (const auto& vector : pi) {
         for (int i = 0; i < 3; i++) {
-			pmin(i) = min(pmax(i), pi(i));
-            pmax(i) = max(pmin(i), pi(i));
+			for (int j = 0; j < nv; j++) {
+				pmin(i) = min(pmax(i), pi[j](i));
+            	pmax(i) = max(pmin(i), pi[j](i));
+			}
         }
     }
 	
@@ -73,7 +75,7 @@ Eigen::MatrixXd polydec(const vector<Eigen::MatrixXd> &Mi, const vector<Eigen::V
 	 * the ureal parameter to obtain the polytopic coordinates. */
 	vector<double> c(3);
 	for (int i = 0; i < 3; i++) {
-		double z = (arg[i] - pmin(i))/(pmax(i) - pmin(i));
+		double z = (p(i) - pmin(i))/(pmax(i) - pmin(i));
 		if (0 == i) {
 			c = {1 - z, z};
 		} else {

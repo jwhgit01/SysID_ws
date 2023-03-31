@@ -136,7 +136,7 @@ gtest/googletest/clean: gtest/googletest/CMakeFiles/gtest.dir/clean
 # Directory level rules for directory sysid_pkg
 
 # Recursive "all" directory target.
-sysid_pkg/all: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all
+sysid_pkg/all: sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all
 
 .PHONY : sysid_pkg/all
 
@@ -147,7 +147,6 @@ sysid_pkg/preinstall:
 
 # Recursive "clean" directory target.
 sysid_pkg/clean: sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/clean
-sysid_pkg/clean: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/clean
@@ -158,6 +157,7 @@ sysid_pkg/clean: sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/clean
+sysid_pkg/clean: sysid_pkg/CMakeFiles/hinf_sysid_node.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/clean
 sysid_pkg/clean: sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/clean
@@ -437,47 +437,6 @@ sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/clean:
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/clean
 
 #=============================================================================
-# Target rules for target sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir
-
-# All Build rule for target.
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/all
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/all
-	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/depend
-	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nsl/src/SysID_ws/build/CMakeFiles --progress-num=9,10 "Built target vel_cmd_excite_node"
-.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all
-
-# Build rule for subdir invocation for target.
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles 0
-.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
-
-# Convenience name for target.
-vel_cmd_excite_node: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
-
-.PHONY : vel_cmd_excite_node
-
-# clean rule for target.
-sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/clean:
-	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/clean
-.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/clean
-
-#=============================================================================
 # Target rules for target sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir
 
 # All Build rule for target.
@@ -746,6 +705,47 @@ std_msgs_generate_messages_cpp: sysid_pkg/CMakeFiles/std_msgs_generate_messages_
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/clean:
 	$(MAKE) -f sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/clean
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/clean
+
+#=============================================================================
+# Target rules for target sysid_pkg/CMakeFiles/hinf_sysid_node.dir
+
+# All Build rule for target.
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_py.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_cpp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_eus.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_lisp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_py.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_eus.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_nodejs.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/std_msgs_generate_messages_cpp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/roscpp_generate_messages_lisp.dir/all
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all: sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/all
+	$(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/depend
+	$(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nsl/src/SysID_ws/build/CMakeFiles --progress-num=9,10 "Built target hinf_sysid_node"
+.PHONY : sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all
+
+# Build rule for subdir invocation for target.
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/hinf_sysid_node.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nsl/src/SysID_ws/build/CMakeFiles 0
+.PHONY : sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule
+
+# Convenience name for target.
+hinf_sysid_node: sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule
+
+.PHONY : hinf_sysid_node
+
+# clean rule for target.
+sysid_pkg/CMakeFiles/hinf_sysid_node.dir/clean:
+	$(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/clean
+.PHONY : sysid_pkg/CMakeFiles/hinf_sysid_node.dir/clean
 
 #=============================================================================
 # Target rules for target sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir

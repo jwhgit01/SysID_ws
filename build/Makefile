@@ -298,19 +298,6 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 #=============================================================================
-# Target rules for targets named vel_cmd_excite_node
-
-# Build rule for target.
-vel_cmd_excite_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 vel_cmd_excite_node
-.PHONY : vel_cmd_excite_node
-
-# fast build rule for target.
-vel_cmd_excite_node/fast:
-	$(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
-.PHONY : vel_cmd_excite_node/fast
-
-#=============================================================================
 # Target rules for targets named std_msgs_generate_messages_nodejs
 
 # Build rule for target.
@@ -441,6 +428,19 @@ std_msgs_generate_messages_cpp/fast:
 .PHONY : std_msgs_generate_messages_cpp/fast
 
 #=============================================================================
+# Target rules for targets named hinf_sysid_node
+
+# Build rule for target.
+hinf_sysid_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 hinf_sysid_node
+.PHONY : hinf_sysid_node
+
+# fast build rule for target.
+hinf_sysid_node/fast:
+	$(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build
+.PHONY : hinf_sysid_node/fast
+
+#=============================================================================
 # Target rules for targets named rosgraph_msgs_generate_messages_eus
 
 # Build rule for target.
@@ -515,7 +515,6 @@ help:
 	@echo "... gtest_main"
 	@echo "... gtest"
 	@echo "... std_msgs_generate_messages_py"
-	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
@@ -526,6 +525,7 @@ help:
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... std_msgs_generate_messages_cpp"
+	@echo "... hinf_sysid_node"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_lisp"

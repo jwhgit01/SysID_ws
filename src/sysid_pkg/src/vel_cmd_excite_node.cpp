@@ -42,17 +42,6 @@ const int T = 30;
 const int fs = 100;
 
 /**
- * @brief Fucntion for publishing debugging info to debug_pub
- */
-void Debug( ros::Publisher debug_pub, string info_str ) {
-	std_msgs::String msg;
-	std:stringstream ss;
-	ss << info_str;
-	msg.data = ss.str();
-	debug_pub.publish(msg);
-}
-
-/**
  * @section Callback functions that get data from the relevant MAVROS topic
  */
 

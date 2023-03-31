@@ -10,7 +10,10 @@
 #include<string>
 #include<map>
 
+#include <Eigen/Dense>
+
 using namespace std;
+using namespace Eigen;
 
 /**
  * @brief Read input data from CSV and place in a map

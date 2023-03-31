@@ -49,10 +49,14 @@ void state_cb( const mavros_msgs::State::ConstPtr& msg ) {
 /* RC inputs (in raw milliseconds)
  * ~rc/in (mavros_msgs/RCIn) */
 mavros_msgs::RCIn rc_input;
-double amp = 0.0;
+double da_cmd, de_cmd, dr_cmd, dt_cmd, amp;
 int PTI_PWM, mode_PWM, submode_PWM, gain_PWM;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	rc_input = *msg;
+	da_cmd = -2.0*(rc_input.channels[0]-1500)/796.0;
+	de_cmd = 2.0*(rc_input.channels[1]-1500)/796.0;
+	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
+	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
 	PTI_PWM = rc_input.channels[7];
 	amp = 1.0*(rc_input.channels[8]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 	mode_PWM = rc_input.channels[9];
@@ -112,9 +116,9 @@ int main( int argc, char **argv ) {
 	Eigen::MatrixXd K(nu,nx);
 	R_IB.setIdentity();
 	double qN0, qE0, qD0, psi0;
-	vector<float> delta_excite(nu) = {0};
-	vector<float> input(nu) = {0};
-	vector<float> vb_ref_vec(3)= {0};
+	vector<float> delta_excite(nu,0);
+	vector<float> input(nu,0);
+	vector<float> vb_ref_vec(3,0);
 
 	/* Load the CSV multisine files into maps */
 	std::map<int,vector<float>> InputExcitationData;
@@ -130,14 +134,18 @@ int main( int argc, char **argv ) {
 	#endif
 
 	/* Load the control gains and nominal states/inputs */
-	Eigen::MatrixXd pi[np];
-	Eigen::MatrixXd Ki[nv];
-	Eigen::MatrixXd x0i[nv];
-	Eigen::MatrixXd u0i[nv];
-	load_control_gains(*pi, file_p, np, 1);
-	load_control_gains(*Ki, file_K, nu, nx);
-	load_control_gains(*x0i, file_x0, nx, 1);
-	load_control_gains(*u0i, file_u0, nu, 1);
+	//vector<Eigen::MatrixXd> pi[np];
+	//vector<Eigen::MatrixXd> Ki[nv];
+	//vector<Eigen::MatrixXd> x0i[nv];
+	//vector<Eigen::MatrixXd> u0i[nv];
+	vector<Eigen::VectorXd> pi;
+	vector<Eigen::MatrixXd> Ki;
+	vector<Eigen::MatrixXd> x0i;
+	vector<Eigen::MatrixXd> u0i;
+	load_control_gains<Eigen::VectorXd,np,1>(pi, file_p);
+	load_control_gains<Eigen::MatrixXd,nu,nx>(Ki, file_K);
+	load_control_gains<Eigen::MatrixXd,nx,1>(x0i, file_x0);
+	load_control_gains<Eigen::MatrixXd,nu,1>(u0i, file_u0);
 
 	/* Initialize the node and create the node handle */
 	ros::init(argc, argv, "vel_cmd_excite_node");
@@ -154,6 +162,8 @@ int main( int argc, char **argv ) {
 		("mavros/imu/data", 1, imu_cb);
 	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
 		("mavros/actuator_control/controls", 1);
+	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
+		("mavros/setpoint_velocity/cmd_vel_unstamped", 1);
 	ros::Publisher debug_pub = nh.advertise<std_msgs::String>
 		("debug", 10);
 
@@ -179,8 +189,10 @@ int main( int argc, char **argv ) {
 		rate.sleep();
 	}
 
-	/* Create the variable used to send actuator controls */
+	/* Create the variable used to send actuator controls
+	 * and velocity commands when not in PTI mode. */
 	mavros_msgs::ActuatorControl actuator_control;
+	geometry_msgs::Twist cmd_vel;
 	
 	/* Send a few setpoints before starting */
 	for (int i = 100; ros::ok() && i > 0; --i) {
@@ -206,7 +218,7 @@ int main( int argc, char **argv ) {
 
 			/* Convert horizontal plane body velocity commands to the NED frame. */
 			q0 = imu_data.orientation;
-			q1(q0.w, q0.x, q0.y, q0.z);
+			q1 = {q0.w, q0.x, q0.y, q0.z};
 			R_IB = q1.toRotationMatrix();
 			vi_ref = R_IB*vb_ref;
 
@@ -249,7 +261,7 @@ int main( int argc, char **argv ) {
 		
 			/* Compute the time index in miliseconds */
 			t1 = ros::Time::now().toSec();
-			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T_ms;
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T;
 			
 			/* Get the velocity refererence and input excitation vectors from the hash maps.
 			 * Also, store the velocity reference in its Eigen array. */
@@ -259,8 +271,8 @@ int main( int argc, char **argv ) {
 
 			/* Get the rotation matrix from the body frame to the inertial frame. */
 			q0 = imu_data.orientation;
-			Eigen::Quaterniond q1(q0.w, q0.x, q0.y, q0.z);
-			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
+			q1 = {q0.w, q0.x, q0.y, q0.z};
+			R_IB = q1.toRotationMatrix();
 
 			/* Get Euler angles from the rotation matrix */
 			// TODO: make sure this order is correct

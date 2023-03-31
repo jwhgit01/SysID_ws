@@ -156,10 +156,18 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
-add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+## vel_cmd_excite_node
+# add_executable(vel_cmd_excite_node src/vel_cmd_excite_node.cpp)
+# add_dependencies(vel_cmd_excite_node ${vel_cmd_excite_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(
+#   vel_cmd_excite_node
+#   ${catkin_LIBRARIES}
+# )
+
+add_executable(hinf_sysid_node src/hinf_sysid_node.cpp)
+add_dependencies(hinf_sysid_node ${hinf_sysid_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
-  vel_cmd_excite_node
+  hinf_sysid_node
   ${catkin_LIBRARIES}
 )
 

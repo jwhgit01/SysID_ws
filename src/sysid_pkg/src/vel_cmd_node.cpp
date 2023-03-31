@@ -45,17 +45,6 @@ const int time_gap = 3;
 const double K = 5.0;
 
 /**
- * @brief Fucntion for publishing debugging info to debug_pub
- */
-void Debug( ros::Publisher debug_pub, string info_str ) {
-	std_msgs::String msg;
-	std:stringstream ss;
-	ss << info_str;
-	msg.data = ss.str();
-	debug_pub.publish(msg);
-}
-
-/**
  * @section Callback functions that get data from the relevant MAVROS topic
  */
 //
