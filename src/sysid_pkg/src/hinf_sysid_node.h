@@ -16,6 +16,7 @@
 #include <mavros_msgs/RCIn.h>
 #include <mavros_msgs/ManualControl.h>
 #include <mavros_msgs/ActuatorControl.h>
+#include <mavros_msgs/ESCStatus.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/Imu.h>
