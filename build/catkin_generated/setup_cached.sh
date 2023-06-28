@@ -8,8 +8,6 @@
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/nsl/src/SysID_ws/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/nsl/src/SysID_ws/devel/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/nsl/src/SysID_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/nsl/src/SysID_ws/build'
 export ROSLISP_PACKAGE_DIRECTORIES='/home/nsl/src/SysID_ws/devel/share/common-lisp'
 export ROS_PACKAGE_PATH="/home/nsl/src/SysID_ws/src:$ROS_PACKAGE_PATH"

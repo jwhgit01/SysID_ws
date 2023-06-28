@@ -183,6 +183,21 @@ std_msgs_generate_messages_py/fast:
 .PHONY : std_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+.PHONY : sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+# Convenience name for target.
+vel_cmd_excite_node: sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/rule
+
+.PHONY : vel_cmd_excite_node
+
+# fast build rule for target.
+vel_cmd_excite_node/fast:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build
+.PHONY : vel_cmd_excite_node/fast
+
+# Convenience name for target.
 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
@@ -333,21 +348,6 @@ std_msgs_generate_messages_cpp/fast:
 .PHONY : std_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
-sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule
-.PHONY : sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule
-
-# Convenience name for target.
-hinf_sysid_node: sysid_pkg/CMakeFiles/hinf_sysid_node.dir/rule
-
-.PHONY : hinf_sysid_node
-
-# fast build rule for target.
-hinf_sysid_node/fast:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build
-.PHONY : hinf_sysid_node/fast
-
-# Convenience name for target.
 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f CMakeFiles/Makefile2 sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
 .PHONY : sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
@@ -407,32 +407,32 @@ rosgraph_msgs_generate_messages_py/fast:
 	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make sysid_pkg/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
-src/hinf_sysid_node.o: src/hinf_sysid_node.cpp.o
+src/vel_cmd_excite_node.o: src/vel_cmd_excite_node.cpp.o
 
-.PHONY : src/hinf_sysid_node.o
+.PHONY : src/vel_cmd_excite_node.o
 
 # target to build an object file
-src/hinf_sysid_node.cpp.o:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/src/hinf_sysid_node.cpp.o
-.PHONY : src/hinf_sysid_node.cpp.o
+src/vel_cmd_excite_node.cpp.o:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.o
+.PHONY : src/vel_cmd_excite_node.cpp.o
 
-src/hinf_sysid_node.i: src/hinf_sysid_node.cpp.i
+src/vel_cmd_excite_node.i: src/vel_cmd_excite_node.cpp.i
 
-.PHONY : src/hinf_sysid_node.i
+.PHONY : src/vel_cmd_excite_node.i
 
 # target to preprocess a source file
-src/hinf_sysid_node.cpp.i:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/src/hinf_sysid_node.cpp.i
-.PHONY : src/hinf_sysid_node.cpp.i
+src/vel_cmd_excite_node.cpp.i:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.i
+.PHONY : src/vel_cmd_excite_node.cpp.i
 
-src/hinf_sysid_node.s: src/hinf_sysid_node.cpp.s
+src/vel_cmd_excite_node.s: src/vel_cmd_excite_node.cpp.s
 
-.PHONY : src/hinf_sysid_node.s
+.PHONY : src/vel_cmd_excite_node.s
 
 # target to generate assembly for a file
-src/hinf_sysid_node.cpp.s:
-	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/hinf_sysid_node.dir/build.make sysid_pkg/CMakeFiles/hinf_sysid_node.dir/src/hinf_sysid_node.cpp.s
-.PHONY : src/hinf_sysid_node.cpp.s
+src/vel_cmd_excite_node.cpp.s:
+	cd /home/nsl/src/SysID_ws/build && $(MAKE) -f sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/build.make sysid_pkg/CMakeFiles/vel_cmd_excite_node.dir/src/vel_cmd_excite_node.cpp.s
+.PHONY : src/vel_cmd_excite_node.cpp.s
 
 # Help Target
 help:
@@ -445,6 +445,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... test"
 	@echo "... std_msgs_generate_messages_py"
+	@echo "... vel_cmd_excite_node"
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
@@ -458,14 +459,13 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... install/strip"
 	@echo "... std_msgs_generate_messages_cpp"
-	@echo "... hinf_sysid_node"
 	@echo "... rosgraph_msgs_generate_messages_eus"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... src/hinf_sysid_node.o"
-	@echo "... src/hinf_sysid_node.i"
-	@echo "... src/hinf_sysid_node.s"
+	@echo "... src/vel_cmd_excite_node.o"
+	@echo "... src/vel_cmd_excite_node.i"
+	@echo "... src/vel_cmd_excite_node.s"
 .PHONY : help
 
 

@@ -30,7 +30,7 @@
  */
 
 // Debugging mode
-#define DEBUG true
+#define DEBUG flase
 
 // CSV input file(s)
 // Note: Must use absolute filepath.
@@ -69,33 +69,6 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
 	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
 	PTI_PWM = rc_input.channels[6];
-	//
-	// OLD
-	//
-	/*
-	if (rc_input.channels[7] > 1666) {
-		vel = 2;
-	} else if (rc_input.channels[7] > 1333) {
-		vel = 1;
-	} else {
-		vel = 0;
-	}
-	if (rc_input.channels[8] > 1666) {
-		mag = 10.0;
-	} else if (rc_input.channels[8] > 1333) {
-		mag = 5.0;
-	} else {
-		mag = 0.0;
-	}
-	if (rc_input.channels[9] > 1500) {
-		dir = 1.0;
-	} else {
-		dir = -1.0;
-	}
-	*/
-	//
-	// New 
-	//
 	if (rc_input.channels[7] > 1666) {
 		a = 1;
 	} else if (rc_input.channels[7] > 1333) {
@@ -296,7 +269,7 @@ int main( int argc, char **argv ) {
 				// Ramp Phase
 				case 1:
 					// Increment the velocity reference from zero
-					delta_vb = 0.005*vb_ss; // at 100Hz this is a 2 second ramp
+					delta_vb = 0.002*vb_ss; // at 100Hz this is a 5 second ramp
 					vb_ref = vb_ref + delta_vb;
 					vi_ms << 0.0, 0.0, 0.0;
 					if (abs(vb_ref(1)) >= mag) {
@@ -310,7 +283,7 @@ int main( int argc, char **argv ) {
 					vb_ref = vb_ss;
 					vi_ms << 0.0, 0.0, 0.0;
 					t = ros::Time::now().toSec();
-					if (t-t0 >= 3.0) {
+					if (t-t0 >= 5.0) { // 5 seconds of steady motion
 						ExcitePhase = 3;
 						t1 = ros::Time::now().toSec();
 					}
@@ -325,8 +298,8 @@ int main( int argc, char **argv ) {
 					vb_ms << ms[0], ms[1], ms[2]; // get velocity components
 					vi_ms = R_IB*vb_ms; // transform to NED frame
 					
-					// End multisine after 15 seconds
-					if (t-t1 >= 15.0) {
+					// End multisine after 20 seconds
+					if (t-t1 >= 20.0) {
 					    vb_ref << 0.0, 0.0, 0.0;
 					    vi_ms << 0.0, 0.0, 0.0;
 					    ExcitePhase = 0;
