@@ -83,10 +83,12 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	} else {
 		b = -1;
 	}
-	if (rc_input.channels[9] > 1500) {
+	if (rc_input.channels[9] > 1666) {
 		mag = 10.0;
+	} else if (rc_input.channels[9] > 1333) {
+	    mag = 5.0;
 	} else {
-		mag = 5.0;
+		mag = 0.0;
 	}
 	amp = 1.0*(rc_input.channels[10]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 }
@@ -272,7 +274,7 @@ int main( int argc, char **argv ) {
 					delta_vb = 0.002*vb_ss; // at 100Hz this is a 5 second ramp
 					vb_ref = vb_ref + delta_vb;
 					vi_ms << 0.0, 0.0, 0.0;
-					if (abs(vb_ref(1)) >= mag) {
+					if (abs(vb_ref(0)) >= mag || abs(vb_ref(1)) >= mag || abs(vb_ref(2)) >= mag) {
 						ExcitePhase = 2;
 						t0 = ros::Time::now().toSec();
 					}
