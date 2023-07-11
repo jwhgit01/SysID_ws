@@ -1,2 +1,0 @@
-sysid_pkg
--DCATKIN_DEVEL_PREFIX=/home/nsl/src/SysID_ws/devel -DCMAKE_INSTALL_PREFIX=/home/nsl/src/SysID_ws/install -G Unix Makefiles
