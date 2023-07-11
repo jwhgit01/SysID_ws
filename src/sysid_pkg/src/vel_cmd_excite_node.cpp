@@ -57,9 +57,7 @@ void state_cb( const mavros_msgs::State::ConstPtr& msg ) {
 mavros_msgs::RCIn rc_input;
 double amp = 0.0;
 int PTI_PWM = 0;
-// unsigned int vel = 0;
 double mag = 0;
-// double dir = 0;
 unsigned int a,b;
 double da_cmd, de_cmd, dr_cmd, dt_cmd;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
@@ -243,8 +241,6 @@ int main( int argc, char **argv ) {
 			Eigen::Matrix3d R_IB = q1.toRotationMatrix();
 			
 			// Get body velocity commands from aucillary rc switches.
-			// vb_ss << 0.0, 0.0, 0.0;
-			// vb_ss(vel) = dir*mag;
 			if (a==-1 && b==-1) {
 				vb_ss << -mag, -mag, 0.0;
 			} else if (a==0 && b==-1) {
@@ -254,7 +250,7 @@ int main( int argc, char **argv ) {
 			} else if (a==-1 && b==0) {
 				vb_ss << +mag, +mag, 0.0;
 			} else if (a==0 && b==0) {
-				vb_ss << -mag, -mag, +mag;
+				vb_ss << -mag, -mag, +mag; // This "+" is because of the ENU mavros convention
 			} else if (a==1 && b==0) {
 				vb_ss << +mag, -mag, +mag;
 			} else if (a==-1 && b==1) {
@@ -271,7 +267,7 @@ int main( int argc, char **argv ) {
 				// Ramp Phase
 				case 1:
 					// Increment the velocity reference from zero
-					delta_vb = 0.005*vb_ss; // at 100Hz this is a 2 second ramp
+					delta_vb = 0.002*vb_ss; // at 100Hz this is a 5 second ramp
 					vb_ref = vb_ref + delta_vb;
 					vi_ms << 0.0, 0.0, 0.0;
 					if (abs(vb_ref(0)) >= mag || abs(vb_ref(1)) >= mag || abs(vb_ref(2)) >= mag) {
