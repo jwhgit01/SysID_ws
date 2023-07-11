@@ -246,21 +246,21 @@ int main( int argc, char **argv ) {
 			// vb_ss << 0.0, 0.0, 0.0;
 			// vb_ss(vel) = dir*mag;
 			if (a==-1 && b==-1) {
-				vb_ss << -mag, -mag, -mag;
-			} else if (a==0 && b==-1) {
-				vb_ss << +mag, -mag, -mag;
-			} else if (a==1 && b==-1) {
-				vb_ss << -mag, +mag, -mag;
-			} else if (a==-1 && b==0) {
-				vb_ss << +mag, +mag, -mag;
-			} else if (a==0 && b==0) {
 				vb_ss << -mag, -mag, 0.0;
-			} else if (a==1 && b==0) {
+			} else if (a==0 && b==-1) {
 				vb_ss << +mag, -mag, 0.0;
-			} else if (a==-1 && b==1) {
+			} else if (a==1 && b==-1) {
 				vb_ss << -mag, +mag, 0.0;
-			} else if (a==0 && b==1) {
+			} else if (a==-1 && b==0) {
 				vb_ss << +mag, +mag, 0.0;
+			} else if (a==0 && b==0) {
+				vb_ss << -mag, -mag, +mag;
+			} else if (a==1 && b==0) {
+				vb_ss << +mag, -mag, +mag;
+			} else if (a==-1 && b==1) {
+				vb_ss << -mag, +mag, +mag;
+			} else if (a==0 && b==1) {
+				vb_ss << +mag, +mag, +mag;
 			} else {
 				vb_ss << 0.0, 0.0, 0.0;
 			}
