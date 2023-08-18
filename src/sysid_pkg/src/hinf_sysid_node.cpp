@@ -24,13 +24,13 @@ const int nr = 4;
  * miliseconds. Because we use a hashmap to acess this data, the
  * intervals may be irregular, but must be ordered.
  */
-const string file_p = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/control_gains/????.csv";
-const string file_K = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/control_gains/????.csv";
-const string file_x0 = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/control_gains/????.csv";
-const string file_u0 = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/control_gains/????.csv";
-const string file_mix = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/control_gains/????.csv";
-const string file_excite = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f02-4_100hz.csv";
-const string file_ref = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_3axis_T30_f001-05_100hz.csv";
+const string file_p = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_p.csv";
+const string file_K = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_K.csv";
+const string file_x0 = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_x0.csv";
+const string file_u0 = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_u0.csv";
+const string file_mix = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_mix.csv";
+const string file_excite = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
+const string file_ref = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/ms_3axis_T30_f001-02_100hz.csv";
 const int T = 30; // final time of the input signal
 const int fs = 100; // sampling rate of the input signal
 
@@ -62,11 +62,11 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	de_cmd = 2.0*(rc_input.channels[1]-1500)/796.0;
 	dr_cmd = 2.0*(rc_input.channels[3]-1500)/796.0;
 	dt_cmd = 1.0*(rc_input.channels[2]-1102)/796.0;
-	PTI_PWM = rc_input.channels[7];
-	amp = 1.0*(rc_input.channels[8]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
-	mode_PWM = rc_input.channels[9];
-	submode_PWM = rc_input.channels[10];
-	gain_PWM = rc_input.channels[11];
+	PTI_PWM = rc_input.channels[6];
+	amp = 1.0*(rc_input.channels[10]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
+	mode_PWM = rc_input.channels[7];
+	submode_PWM = rc_input.channels[8];
+	gain_PWM = rc_input.channels[9];
 }
 
 /* RC Rx, interpreted and normalized.
@@ -116,17 +116,21 @@ int main( int argc, char **argv ) {
 	ros::init(argc, argv, "vel_cmd_excite_node");
 	ros::NodeHandle nh;
 
-	/* Create subscribers and publishers */
+	/* Create subscribers */
 	ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
 		("mavros/state", 1, state_cb);
 	ros::Subscriber rc_in_sub = nh.subscribe<mavros_msgs::RCIn>
 		("mavros/rc/in", 1, rcin_cb);
 	ros::Subscriber manual_in_sub = nh.subscribe<mavros_msgs::ManualControl>
 		("mavros/manual_control/control", 1, manual_cb);
-	ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
-		("mavros/imu/data", 1, imu_cb);
+	ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>
+		("mavros/local_position/pose", 1, pose_cb);
+	ros::Subscriber velocity_sub = nh.subscribe<geometry_msgs::TwistStamped>
+		("mavros/local_position/velocity", 1, velocity_cb);
 	ros::Subscriber esc_status_sub = nh.subscribe<mavros_msgs::ESCStatus>
 		("mavros/esc_status/esc_status/", 1, esc_status_cb);
+	
+	/* Create publishers */
 	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
 		("mavros/actuator_control/controls", 1);
 	ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>
@@ -163,10 +167,10 @@ int main( int argc, char **argv ) {
 	Eigen::MatrixXd K(nu,nx);
 	Eigen::MatrixXd M(nu,nr);
 	Eigen::MatrixXd Minv(nr,nu);
-	vector<Eigen::VectorXd> pi;
-	vector<Eigen::MatrixXd> Ki;
-	vector<Eigen::MatrixXd> x0i;
-	vector<Eigen::MatrixXd> u0i;
+	vector<Eigen::VectorXd> pi(nv);
+	vector<Eigen::MatrixXd> Ki(nv);
+	vector<Eigen::MatrixXd> x0i(nv);
+	vector<Eigen::MatrixXd> u0i(nv);
 	vector<float> delta_excite(nu,0);
 	vector<float> input(nr,0);
 	vector<float> vb_ref_vec(3,0);
@@ -187,8 +191,8 @@ int main( int argc, char **argv ) {
 		return 0;
 	}
 	#if DEBUG
-		ROS_INFO_STREAM("Input data map created successfully!");
-		Debug(debug_pub,"Input data map created successfully!");
+		ROS_INFO_STREAM("Input data maps created successfully!");
+		Debug(debug_pub,"Input data maps created successfully!");
 	#endif
 
 	/* Load the control gains and nominal states/inputs */
@@ -196,7 +200,7 @@ int main( int argc, char **argv ) {
 	load_control_gains<Eigen::MatrixXd,nu,nx>(Ki, file_K);
 	load_control_gains<Eigen::MatrixXd,nx,1>(x0i, file_x0);
 	load_control_gains<Eigen::MatrixXd,nu,1>(u0i, file_u0);
-	if ( /* Check that the gains are correct */ ) {
+	if ( pi.size() < 1 ) {
 		ROS_ERROR("Vertex list not created!");
 		return 0;
 	}
@@ -208,6 +212,10 @@ int main( int argc, char **argv ) {
 	/* Load the mixing matrix and take its pseudoinverse */
 	M = loadMatrix(file_mix);
 	Minv = M.completeOrthogonalDecomposition().pseudoInverse();
+	#if DEBUG
+		ROS_INFO_STREAM("M =\n"<<M);
+		ROS_INFO_STREAM("Minv =\n"<<Minv);
+	#endif
 
 	/* Wait for FCU connection */
 	while ( ros::ok() && !current_state.connected ) {
@@ -230,6 +238,7 @@ int main( int argc, char **argv ) {
 		rate.sleep();
 	}
 	#if DEBUG
+		ROS_INFO_STREAM("ROS is ready!");
 		Debug(debug_pub, "ROS is ready!");
 	#endif
 
@@ -247,7 +256,7 @@ int main( int argc, char **argv ) {
 			vb_ref << da_cmd, de_cmd, 0.0;
 
 			/* Convert horizontal plane body velocity commands to the NED frame. */
-			q0 = imu_data.orientation;
+			q0 = pose_data.pose.orientation;
 			q1 = {q0.w, q0.x, q0.y, q0.z};
 			R_IB = q1.toRotationMatrix();
 			vi_ref = R_IB*vb_ref;
@@ -275,11 +284,13 @@ int main( int argc, char **argv ) {
 				qE0 = pose_data.pose.position.y;
 				qD0 = pose_data.pose.position.z; 
 				#if DEBUG
+					ROS_INFO_STREAM("q0 = "+to_string(qN0)+","+to_string(qE0)+","+to_string(qD0));
 					Debug(debug_pub, "q0 = "+to_string(qN0)+","+to_string(qE0)+","+to_string(qD0));
 				#endif
 				// TODO: make sure this order is correct
 				psi0 = R_IB.eulerAngles(2, 1, 0)[0];
 				#if DEBUG
+					ROS_INFO_STREAM("psi0 = "+to_string(psi0));
 					Debug(debug_pub, "psi0 = "+to_string(psi0));
 				#endif
 
@@ -313,7 +324,7 @@ int main( int argc, char **argv ) {
 			vb_ref << vb_ref_vec[0], vb_ref_vec[1], vb_ref_vec[2];
 
 			/* Get the rotation matrix from the body frame to the inertial frame. */
-			q0 = imu_data.orientation;
+			q0 = pose_data.pose.orientation;
 			q1 = {q0.w, q0.x, q0.y, q0.z};
 			R_IB = q1.toRotationMatrix();
 

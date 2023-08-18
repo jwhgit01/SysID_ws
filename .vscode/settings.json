@@ -26,6 +26,9 @@
         "specialfunctions": "cpp",
         "splines": "cpp",
         "iosfwd": "cpp",
-        "*.expression": "cpp"
+        "*.expression": "cpp",
+        "*.ipp": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp"
     }
 }

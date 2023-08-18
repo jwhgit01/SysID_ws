@@ -165,12 +165,12 @@ target_link_libraries(
 )
 
 ## hinf_sysid_node
-#add_executable(hinf_sysid_node src/hinf_sysid_node.cpp)
-#add_dependencies(hinf_sysid_node ${hinf_sysid_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(
-#  hinf_sysid_node
-#  ${catkin_LIBRARIES}
-#)
+add_executable(hinf_sysid_node src/hinf_sysid_node.cpp)
+add_dependencies(hinf_sysid_node ${hinf_sysid_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(
+  hinf_sysid_node
+  ${catkin_LIBRARIES}
+)
 
 #add_executable(actuator_control_node src/actuator_control_node.cpp)
 #add_dependencies(actuator_control_node ${actuator_control_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

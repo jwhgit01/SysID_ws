@@ -37,7 +37,7 @@
 // Note: first column of CSV file must be integers representing miliseconds.
 // Because we use a hashmap to access this data, the
 // intervals may be irregular, but must be ordered.
-const string file0 = "/home/nsl/src/RotorSysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
+const string file0 = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/InputCSVs/ms_4axis_T30_f01-2_100hz.csv";
 const int T = 30;
 const int fs = 100;
 
