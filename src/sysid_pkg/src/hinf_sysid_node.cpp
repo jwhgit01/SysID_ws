@@ -11,7 +11,7 @@
 /* Debugging mode */
 #define DEBUG true
 
-/* Numbers of states, inputs, LPV vertices, and parameters */
+/* Numbers of states, inputs, LPV vertices, parameters, and rotors */
 const int nx = 16;
 const int nu = 4;
 const int nv = 8;
@@ -108,57 +108,9 @@ void esc_status_cb( const mavros_msgs::ESCStatus::ConstPtr& msg ) {
  * @short Main ROS function
  */
 int main( int argc, char **argv ) {
-	
 	/**
-	 * @section Initialize variables and setup ROS node
+	 * @section Setup the ROS node, initialize the control law, and connect to FCU.
 	 */
-
-	/* Initialize variables */
-	bool PTI = false;
-	int time_idx = 0;
-	double t, t0, t1, qN0, qE0, qD0, psi0;
-	geometry_msgs::Quaternion q0;
-	Eigen::Quaterniond q1;
-	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, p0;
-	Eigen::VectorXd dx(nx);
-	Eigen::VectorXd x0(nx);
-	Eigen::VectorXd u(nu);
-	Eigen::VectorXd u0(nu);
-	Eigen::VectorXd delta(nu);
-	Eigen::VectorXd Omega(nr);
-	Eigen::Matrix3d R_IB;
-	Eigen::MatrixXd K(nu,nx);
-	Eigen::MatrixXd M(nu,nr);
-	Eigen::MatrixXd Minv(nr,nu);
-	vector<Eigen::VectorXd> pi;
-	vector<Eigen::MatrixXd> Ki;
-	vector<Eigen::MatrixXd> x0i;
-	vector<Eigen::MatrixXd> u0i;
-	vector<float> delta_excite(nu,0);
-	vector<float> input(4,0);
-	vector<float> vb_ref_vec(3,0);
-	R_IB.setIdentity();
-
-	/* Load the CSV multisine files into maps */
-	std::map<int,vector<float>> InputExcitationData;
-	std::map<int,vector<float>> VelocityReferenceData;
-	load_data(VelocityReferenceData, file_ref);
-	load_data(InputExcitationData, file_excite);
-	if (VelocityReferenceData.count(1)<1 || InputExcitationData.count(1)<1) {
-		ROS_ERROR("Input data map not created!");
-		return 0;
-	}
-	#if DEBUG
-		ROS_INFO_STREAM("Input data map created successfully!");
-	#endif
-
-	/* Load the control gains and nominal states/inputs */
-	load_control_gains<Eigen::VectorXd,np,1>(pi, file_p);
-	load_control_gains<Eigen::MatrixXd,nu,nx>(Ki, file_K);
-	load_control_gains<Eigen::MatrixXd,nx,1>(x0i, file_x0);
-	load_control_gains<Eigen::MatrixXd,nu,1>(u0i, file_u0);
-	M = loadMatrix(file_mix);
-	Minv = M.completeOrthogonalDecomposition().pseudoInverse();
 
 	/* Initialize the node and create the node handle */
 	ros::init(argc, argv, "vel_cmd_excite_node");
@@ -184,15 +136,78 @@ int main( int argc, char **argv ) {
 
 	/* Double check debugging topic */
 	#if DEBUG
-		Debug(debug_pub, "Published to debug_pub sucessfully!");
+		ROS_INFO_STREAM("Publishing to debug_pub topic...");
+		Debug(debug_pub,"Published to debug_pub sucessfully!");
 	#endif
 
 	/* Defines the rate at which the control loop runs. Note that the code
 	 * will not run faster than this rate, but may run slower if it is
-	 * computationally taxing. The setpoint publishing rate MUST be faster
-	 * than 2Hz.
+	 * computationally taxing. The setpoint publishing rate MUST be faster than 2Hz.
 	 */
 	ros::Rate rate( (double)fs );
+
+	/* Declare and initialize variables */
+	bool PTI = false;
+	int time_idx = 0;
+	double t, t0, t1, qN0, qE0, qD0, psi0;
+	geometry_msgs::Quaternion q0;
+	Eigen::Quaterniond q1;
+	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, p0;
+	Eigen::VectorXd dx(nx);
+	Eigen::VectorXd x0(nx);
+	Eigen::VectorXd u(nu);
+	Eigen::VectorXd u0(nu);
+	Eigen::VectorXd delta(nu);
+	Eigen::VectorXd Omega(nr);
+	Eigen::Matrix3d R_IB;
+	Eigen::MatrixXd K(nu,nx);
+	Eigen::MatrixXd M(nu,nr);
+	Eigen::MatrixXd Minv(nr,nu);
+	vector<Eigen::VectorXd> pi;
+	vector<Eigen::MatrixXd> Ki;
+	vector<Eigen::MatrixXd> x0i;
+	vector<Eigen::MatrixXd> u0i;
+	vector<float> delta_excite(nu,0);
+	vector<float> input(nr,0);
+	vector<float> vb_ref_vec(3,0);
+	vector<float> Omega_vec(nr,0);
+	R_IB.setIdentity();
+
+	/* Load the CSV multisine files into maps */
+	std::map<int,vector<float>> InputExcitationData;
+	std::map<int,vector<float>> VelocityReferenceData;
+	load_data(VelocityReferenceData, file_ref);
+	load_data(InputExcitationData, file_excite);
+	if (VelocityReferenceData.count(1) < 1) {
+		ROS_ERROR("Velocity reference data map not created!");
+		return 0;
+	}
+	if (InputExcitationData.count(1) < 1) {
+		ROS_ERROR("Motor excitation data map not created!");
+		return 0;
+	}
+	#if DEBUG
+		ROS_INFO_STREAM("Input data map created successfully!");
+		Debug(debug_pub,"Input data map created successfully!");
+	#endif
+
+	/* Load the control gains and nominal states/inputs */
+	load_control_gains<Eigen::VectorXd,np,1>(pi, file_p);
+	load_control_gains<Eigen::MatrixXd,nu,nx>(Ki, file_K);
+	load_control_gains<Eigen::MatrixXd,nx,1>(x0i, file_x0);
+	load_control_gains<Eigen::MatrixXd,nu,1>(u0i, file_u0);
+	if ( /* Check that the gains are correct */ ) {
+		ROS_ERROR("Vertex list not created!");
+		return 0;
+	}
+	#if DEBUG
+		ROS_INFO_STREAM("Control gains loaded successfully!");
+		Debug(debug_pub,"Control gains loaded successfully!");
+	#endif
+
+	/* Load the mixing matrix and take its pseudoinverse */
+	M = loadMatrix(file_mix);
+	Minv = M.completeOrthogonalDecomposition().pseudoInverse();
 
 	/* Wait for FCU connection */
 	while ( ros::ok() && !current_state.connected ) {
@@ -220,7 +235,7 @@ int main( int argc, char **argv ) {
 
 	/**
 	 * @brief Main loop
-	 * @details While everything is okay, loop at the specified rate, SAMPLERATE
+	 * @details While everything is okay, loop at the specified rate, fs
 	 */
 	while (ros::ok()) {
 
@@ -285,9 +300,9 @@ int main( int argc, char **argv ) {
 			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T;
 
 			/* Get RPM data from esc_status and compute delta */
-			Omega_vec = esc_status_data.rpm*rpm2rps;
+			//Omega_vec = esc_status_data.rpm*rpm2rps;
 			for (int i = 0; i < nr; i++) {
-				Omega(i) = Omega_vec[i];
+				Omega(i) = esc_status_data.esc_status[i].rpm*rpm2rps;
 			}
 			delta = M*Omega;
 
@@ -304,7 +319,7 @@ int main( int argc, char **argv ) {
 
 			/* Get Euler angles from the rotation matrix */
 			// TODO: make sure this order is correct
-			Theta = R_IB.eulerAngles(2, 1, 0).reverse;
+			Theta = R_IB.eulerAngles(2,1,0);
 			#if DEBUG
 				Debug(debug_pub, "Theta = "+to_string(Theta(0))+","+to_string(Theta(1))+","+to_string(Theta(2)));
 			#endif

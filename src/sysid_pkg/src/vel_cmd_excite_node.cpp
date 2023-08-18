@@ -123,6 +123,7 @@ int main( int argc, char **argv ) {
 	Eigen::Vector3d vi_ref;
 	Eigen::Vector3d vb_ms;
 	Eigen::Vector3d vi_ms;
+	double r_ms;
 	int time_idx = 0;
 	vector<float> ms(4);
 	vector<float> input(4);
@@ -270,6 +271,7 @@ int main( int argc, char **argv ) {
 					delta_vb = 0.002*vb_ss; // at 100Hz this is a 5 second ramp
 					vb_ref = vb_ref + delta_vb;
 					vi_ms << 0.0, 0.0, 0.0;
+					r_ms = 0.0;
 					if (abs(vb_ref(0)) >= mag || abs(vb_ref(1)) >= mag || abs(vb_ref(2)) >= mag) {
 						ExcitePhase = 2;
 						t0 = ros::Time::now().toSec();
@@ -280,6 +282,7 @@ int main( int argc, char **argv ) {
 				case 2:
 					vb_ref = vb_ss;
 					vi_ms << 0.0, 0.0, 0.0;
+					r_ms = 0.0;
 					t = ros::Time::now().toSec();
 					if (t-t0 >= 5.0) { // 5 seconds of steady motion
 						ExcitePhase = 3;
@@ -295,11 +298,12 @@ int main( int argc, char **argv ) {
 					ms = InputData[time_idx]; // get vector from map
 					vb_ms << ms[0], ms[1], ms[2]; // get velocity components
 					vi_ms = R_IB*vb_ms; // transform to NED frame
-					
+					r_ms = 90*(3.1415926/180.0)*ms[3]; // excited yaw rate
 					// End multisine after 20 seconds
 					if (t-t1 >= 20.0) {
 					    vb_ref << 0.0, 0.0, 0.0;
 					    vi_ms << 0.0, 0.0, 0.0;
+						r_ms = 0.0;
 					    ExcitePhase = 0;
 					}
 					break;
@@ -307,6 +311,7 @@ int main( int argc, char **argv ) {
 				default:
 					vb_ref << 0.0, 0.0, 0.0;
 					vi_ms << 0.0, 0.0, 0.0;
+					r_ms = 0.0;
 					ExcitePhase = 0;
 					break;
 			}
@@ -318,7 +323,7 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.x = amp*vi_ms(0) + vi_ref(0);
 			cmd_vel.linear.y = amp*vi_ms(1) + vi_ref(1);
 			cmd_vel.linear.z = amp*vi_ms(2) + vi_ref(2);
-			cmd_vel.angular.z = 90*(3.1415926/180.0)*amp*ms[3];
+			cmd_vel.angular.z = amp*r_ms;
 			
 			// If the PTI switch has been set back to off, set the PRI bool to false
 			if ( PTI_PWM <= 1500 ) {
