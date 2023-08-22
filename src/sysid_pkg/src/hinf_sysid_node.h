@@ -20,80 +20,99 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/Imu.h>
+#include <math.h>
 
 #include "sysid_tools.h"
 
 using namespace std;
 
 /**
- * @short Read control gain data from CSV
+ * @brief Read control gain data from CSV
  */
 template <typename MatrixType, int NumRows, int NumCols>
-void load_control_gains(vector<MatrixType> &Ki, const string filepath) {
+int load_control_gains(vector<MatrixType> &Ki, const string filepath) {
 
-	// read data from CSV file and store in large matrix
+	/* read data from CSV file and store in large matrix */
 	Eigen::MatrixXd BigK = loadMatrix(filepath);
 	int nv = Ki.size();
+	if (nv < 1) {
+		return nv;
+	}
 
-	// Get each Ki,
+	/* Get each Ki */
 	for (int i = 0; i < nv; i++) {
 		Ki[i] = BigK.block<NumRows,NumCols>(0,i*NumCols);
 	}
-	return;
+	return nv;
 	
 }
 
 /**
- * @short polydec 
+ * @brief Interval struct used in compuation of polytopic coordinates
  */
-Eigen::MatrixXd polydec(const vector<Eigen::MatrixXd> &Mi, const vector<Eigen::VectorXd> &pi, Eigen::VectorXd p) {
+struct Interval {
+	double min;
+	double max;
+};
 
-	/* Get the number of vertices and parameters */
-	int nv = Mi.size();
+/**
+ * @brief Compute the polytopic coordinates of a given parameter value
+ */
+vector<double> polytopic_coordinates(const vector<Interval> &box, const vector<double> &p) {
+	/* Get the number of parameters and check for errors */
 	int np = p.size();
+	if (np < 1) {
+		return vector<double> ();
+	}
+
+	/* Initialize the polytopic coordinate vector */
+	vector<double> c = {1.0};
+
+	/* Loop through each parameter and compute polytopic coordinates */
+	for (int i = 0; i < np; i++) {
+		/* Get the min and max values from the box struct */
+		double minval = box[i].min;
+		double maxval = box[i].max;
+
+		/* Interpolate along the current paramater */
+		double t = (p[i] - minval)/(maxval - minval);
+
+		/* If we wanted to prevent extrapolation, check that 0 < t < 1 here... */
+
+		/* Update the result */
+		vector<double> c2 = c;
+		for (size_t j = 0; j < c.size(); j++) {
+			c[j] *= 1-t;
+			c2[j] *= t;
+		}
+		c.insert(c.end(), c2.begin(), c2.end());
+	}
+
+	/* Return the final result */
+	return c;
+}
+
+/**
+ * @brief Interpolate using polytopic coordinates 
+ */
+Eigen::MatrixXd interpolate(const vector<double> c, const vector<Eigen::MatrixXd> &Ki ) {
+
+	/* Get the number of vertices and enforce dimensions */
+	int nv = c.size();
+	if (nv < 1 || Ki.size() != nv) {
+		return Eigen::MatrixXd(0,0);
+	}
 
 	/* Initialize the result */
-    int rows = Mi[0].rows();
-    int cols = Mi[0].cols();
-    Eigen::MatrixXd M(rows, cols);
-	M.setZero();
+	int rows = Ki[0].rows();
+	int cols = Ki[0].cols();
+	Eigen::MatrixXd K(rows, cols);
+	K.setZero();
 
-	/* Find parameter bounds. */
-    Eigen::VectorXd pmin(np);
-	Eigen::VectorXd pmax(np);
-    pmin.setConstant(numeric_limits<double>::lowest());
-	pmax.setConstant(numeric_limits<double>::lowest());
-    for (const auto& vector : pi) {
-        for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < nv; j++) {
-				pmin(i) = min(pmax(i), pi[j](i));
-            	pmax(i) = max(pmin(i), pi[j](i));
-			}
-        }
-    }
-	
-	/* Loop through parameters and linearly interpolate using 
-	 * the ureal parameter to obtain the polytopic coordinates. */
-	vector<double> c(3);
-	for (int i = 0; i < 3; i++) {
-		double z = (p(i) - pmin(i))/(pmax(i) - pmin(i));
-		if (0 == i) {
-			c = {1 - z, z};
-		} else {
-			vector<double> new_c;
-			for (int j = 0; j < c.size(); j++) {
-				new_c.push_back(c[j] * (1 - z));
-				new_c.push_back(c[j] * z);
-			}
-			c = new_c;
-		}
-	}
-
-	/* Evaluate using polytope coordinates. */
+	/* Evaluate using polytope coordinates */
 	for (int i = 0; i < nv; i++) {
-		M += c[i]*Mi[i];
+		K += c[i]*Ki[i];
 	}
-	return M;
-
+	return K;
 }
 

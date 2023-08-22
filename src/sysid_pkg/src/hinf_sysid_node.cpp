@@ -8,15 +8,17 @@
  */
 #include "hinf_sysid_node.h"
 
+using namespace std;
+
 /* Debugging mode */
-#define DEBUG true
+#define DEBUG false
 
 /* Numbers of states, inputs, LPV vertices, parameters, and rotors */
-const int nx = 16;
-const int nu = 4;
-const int nv = 8;
-const int np = 3;
-const int nr = 4;
+static constexpr int nx = 16;
+static constexpr int nu = 4;
+static constexpr int nv = 8;
+static constexpr int np = 3;
+static constexpr int nr = 4;
 
 /**
  * CSV input files (absolute file paths):
@@ -24,7 +26,7 @@ const int nr = 4;
  * miliseconds. Because we use a hashmap to acess this data, the
  * intervals may be irregular, but must be ordered.
  */
-const string file_p = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_p.csv";
+const string file_box = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_box.csv";
 const string file_K = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_K.csv";
 const string file_x0 = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_x0.csv";
 const string file_u0 = "/home/nsl/src/SysID_ws/src/sysid_pkg/src/control_gains/WQ_LPV_Hinf_v9_u0.csv";
@@ -35,10 +37,10 @@ const int T = 30; // final time of the input signal
 const int fs = 100; // sampling rate of the input signal
 
 /* Define the designed amplitude of atuator_controls excitatons */
-const double amp_d = 0.1; // TODO: determine this value
+const double amp_d = 1; // TODO: determine this value
 
 /* Constants for conversions */
-const double rpm2rps = 0.104719755;
+static constexpr double rpm2rps = 0.104719755;
 
 /**
  * @section Callback functions that get data from the relevant MAVROS topic
@@ -123,12 +125,14 @@ int main( int argc, char **argv ) {
 		("mavros/rc/in", 1, rcin_cb);
 	ros::Subscriber manual_in_sub = nh.subscribe<mavros_msgs::ManualControl>
 		("mavros/manual_control/control", 1, manual_cb);
+	ros::Subscriber imu_sub = nh.subscribe<sensor_msgs::Imu>
+		("mavros/imu/data", 1, imu_cb);
 	ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>
 		("mavros/local_position/pose", 1, pose_cb);
 	ros::Subscriber velocity_sub = nh.subscribe<geometry_msgs::TwistStamped>
 		("mavros/local_position/velocity", 1, velocity_cb);
 	ros::Subscriber esc_status_sub = nh.subscribe<mavros_msgs::ESCStatus>
-		("mavros/esc_status/esc_status/", 1, esc_status_cb);
+		("mavros/esc_status/", 1, esc_status_cb);
 	
 	/* Create publishers */
 	ros::Publisher actuator_control_pub = nh.advertise<mavros_msgs::ActuatorControl>
@@ -146,8 +150,7 @@ int main( int argc, char **argv ) {
 
 	/* Defines the rate at which the control loop runs. Note that the code
 	 * will not run faster than this rate, but may run slower if it is
-	 * computationally taxing. The setpoint publishing rate MUST be faster than 2Hz.
-	 */
+	 * computationally taxing. The setpoint publishing rate MUST be faster than 2Hz. */
 	ros::Rate rate( (double)fs );
 
 	/* Declare and initialize variables */
@@ -156,7 +159,7 @@ int main( int argc, char **argv ) {
 	double t, t0, t1, qN0, qE0, qD0, psi0;
 	geometry_msgs::Quaternion q0;
 	Eigen::Quaterniond q1;
-	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, p0;
+	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, Theta_ENU, p0;
 	Eigen::VectorXd dx(nx);
 	Eigen::VectorXd x0(nx);
 	Eigen::VectorXd u(nu);
@@ -167,7 +170,9 @@ int main( int argc, char **argv ) {
 	Eigen::MatrixXd K(nu,nx);
 	Eigen::MatrixXd M(nu,nr);
 	Eigen::MatrixXd Minv(nr,nu);
-	vector<Eigen::VectorXd> pi(nv);
+	vector<Interval> box(np);
+	vector<double> p(np,0.0);
+	vector<double> c(nv,1.0/nv);
 	vector<Eigen::MatrixXd> Ki(nv);
 	vector<Eigen::MatrixXd> x0i(nv);
 	vector<Eigen::MatrixXd> u0i(nv);
@@ -195,12 +200,19 @@ int main( int argc, char **argv ) {
 		Debug(debug_pub,"Input data maps created successfully!");
 	#endif
 
+	/* Load the parameter box */
+	Eigen::MatrixXd BOX(np,2);
+	BOX = loadMatrix(file_box);
+	for (int i = 0; i < np; i++) {
+		box[i].min = BOX(i,0);
+		box[i].max = BOX(i,1);
+	}
+
 	/* Load the control gains and nominal states/inputs */
-	load_control_gains<Eigen::VectorXd,np,1>(pi, file_p);
 	load_control_gains<Eigen::MatrixXd,nu,nx>(Ki, file_K);
 	load_control_gains<Eigen::MatrixXd,nx,1>(x0i, file_x0);
 	load_control_gains<Eigen::MatrixXd,nu,1>(u0i, file_u0);
-	if ( pi.size() < 1 ) {
+	if ( Ki.size() < 1 ) {
 		ROS_ERROR("Vertex list not created!");
 		return 0;
 	}
@@ -248,6 +260,18 @@ int main( int argc, char **argv ) {
 	 */
 	while (ros::ok()) {
 
+		/* Get aircraft attitude from quaternion */
+		q0 = imu_data.orientation;
+		ROS_INFO_STREAM("q_IMU =\n" << q0);
+		q0 = pose_data.pose.orientation;
+		ROS_INFO_STREAM("q_pose =\n" << q0);
+		q1 = {q0.w, q0.x, q0.y, q0.z};
+		R_IB = q1.toRotationMatrix();
+		Theta_ENU = R_IB.eulerAngles(2,1,0);
+		ROS_INFO_STREAM("Theta_ENU =\n" << Theta_ENU);
+		Theta << Theta_ENU(2), -Theta_ENU(1), -Theta_ENU(0);
+		//ROS_INFO_STREAM("Theta =\n" << Theta);
+
 		/* If the we are not in PTI mode, pass through manual inputs as velocity commands */
 		if (!PTI) {
 
@@ -256,9 +280,6 @@ int main( int argc, char **argv ) {
 			vb_ref << da_cmd, de_cmd, 0.0;
 
 			/* Convert horizontal plane body velocity commands to the NED frame. */
-			q0 = pose_data.pose.orientation;
-			q1 = {q0.w, q0.x, q0.y, q0.z};
-			R_IB = q1.toRotationMatrix();
 			vi_ref = R_IB*vb_ref;
 
 			/* Pass through manual inputs as velocity commands. */
@@ -267,11 +288,17 @@ int main( int argc, char **argv ) {
 			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
 			cmd_vel.angular.z = 45*(3.1415926/180.0)*dr_cmd;
 
+			#if DEBUG
+				ROS_INFO_STREAM("vi_d = (" << cmd_vel.linear.x <<","<< cmd_vel.linear.y <<","<< cmd_vel.linear.x <<")");
+				//Debug(debug_pub,"vi_d = (" << cmd_vel.linear.x <<","<< cmd_vel.linear.y <<","<< cmd_vel.linear.x <<")");
+			#endif
+			
 			/* If we have switched to PTI switch to HIGH, capture initial conditions */
 			if ( PTI_PWM > 1500 ) {
 
 				#if DEBUG
-					Debug(debug_pub, "PTI On");
+					ROS_INFO_STREAM("PTI On");
+					Debug(debug_pub,"PTI On");
 				#endif
 
 				/* update PTI logical */
@@ -285,21 +312,32 @@ int main( int argc, char **argv ) {
 				qD0 = pose_data.pose.position.z; 
 				#if DEBUG
 					ROS_INFO_STREAM("q0 = "+to_string(qN0)+","+to_string(qE0)+","+to_string(qD0));
-					Debug(debug_pub, "q0 = "+to_string(qN0)+","+to_string(qE0)+","+to_string(qD0));
+					//Debug(debug_pub, "q0 = "+to_string(qN0)+","+to_string(qE0)+","+to_string(qD0));
 				#endif
-				// TODO: make sure this order is correct
-				psi0 = R_IB.eulerAngles(2, 1, 0)[0];
-				#if DEBUG
-					ROS_INFO_STREAM("psi0 = "+to_string(psi0));
-					Debug(debug_pub, "psi0 = "+to_string(psi0));
-				#endif
+				psi0 = Theta(2);
 
 				/* Initialize the input to be the nominal value
 				 * for the current condition. */
 				vi << velocity_data.twist.linear.x, velocity_data.twist.linear.y, velocity_data.twist.linear.z;
 				vb = R_IB*vi;
-				u0 = polydec(u0i, pi, vb);
+				copy(vb.data(), vb.data()+vb.size(), p.begin());
+				#if DEBUG
+					ROS_INFO_STREAM("vb =\n" << vb);
+					ROS_INFO_STREAM("p = (" << p[0] <<","<< p[1] <<","<< p[2] <<")");
+				#endif
+				c = polytopic_coordinates(box, p);
+				#if DEBUG
+					ROS_INFO_STREAM(to_string(c.size()));
+					ROS_INFO_STREAM("c =");
+					for (const double &value : c) {
+						ROS_INFO_STREAM(" " << value);
+					}
+				#endif
+				u0 = interpolate(c, u0i);
 				u = u0;
+				#if DEBUG
+					ROS_INFO_STREAM("u0 =\n" << u0);
+				#endif
 
 			}
 
@@ -308,31 +346,33 @@ int main( int argc, char **argv ) {
 		
 			/* Compute the time index in miliseconds */
 			t1 = ros::Time::now().toSec();
-			int time_idx = (int)(floor((t1-t0)*(double)fs)) % T;
+			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs);
+			#if DEBUG
+				ROS_INFO_STREAM("t1 = " + to_string(t1));
+				ROS_INFO_STREAM("time_idx = " + to_string(time_idx));
+			#endif
 
 			/* Get RPM data from esc_status and compute delta */
-			//Omega_vec = esc_status_data.rpm*rpm2rps;
 			for (int i = 0; i < nr; i++) {
 				Omega(i) = esc_status_data.esc_status[i].rpm*rpm2rps;
 			}
+			#if DEBUG
+				ROS_INFO_STREAM("Omega = (" << Omega(0) <<","<< Omega(1) <<","<< Omega(2) <<","<< Omega(3) <<")");
+				//Debug(debug_pub,"Omega = (" << Omega(0) <<","<< Omega(1) <<","<< Omega(2) <<","<< Omega(3) <<")");
+			#endif
 			delta = M*Omega;
+			#if DEBUG
+				ROS_INFO_STREAM("delta = (" << delta(0) <<","<< delta(1) <<","<< delta(2) <<","<< delta(3) <<")");
+				//Debug(debug_pub,"Omega = (" << delta(0) <<","<< delta(1) <<","<< delta(2) <<","<< delta(3) <<")");
+			#endif
 
 			/* Get the velocity refererence and input excitation vectors from the hash maps.
 			 * Also, store the velocity reference in its Eigen array. */
 			vb_ref_vec = VelocityReferenceData[time_idx];
 			delta_excite = InputExcitationData[time_idx];
 			vb_ref << vb_ref_vec[0], vb_ref_vec[1], vb_ref_vec[2];
-
-			/* Get the rotation matrix from the body frame to the inertial frame. */
-			q0 = pose_data.pose.orientation;
-			q1 = {q0.w, q0.x, q0.y, q0.z};
-			R_IB = q1.toRotationMatrix();
-
-			/* Get Euler angles from the rotation matrix */
-			// TODO: make sure this order is correct
-			Theta = R_IB.eulerAngles(2,1,0);
 			#if DEBUG
-				Debug(debug_pub, "Theta = "+to_string(Theta(0))+","+to_string(Theta(1))+","+to_string(Theta(2)));
+				ROS_INFO_STREAM("vb_ref = " << vb_ref);
 			#endif
 
 			/* Convert interial velocity measurements to the body frame. */
@@ -340,15 +380,22 @@ int main( int argc, char **argv ) {
 			vi << velocity_data.twist.linear.x, velocity_data.twist.linear.y, velocity_data.twist.linear.z;
 			vb = R_IB*vi;
 			#if DEBUG
-				Debug(debug_pub, "vi = "+to_string(vi(0))+","+to_string(vi(1))+","+to_string(vi(2)));
-				Debug(debug_pub, "vb = "+to_string(vb(0))+","+to_string(vb(1))+","+to_string(vb(2)));
+				ROS_INFO_STREAM("vb = " << vb);
 			#endif
 
 			/* Compute the feedback gain, nominal states, and nominal inputs 
 			* as a linear combination of the vertex gains. */
-			K = polydec(Ki, pi, vb_ref);
-			x0 = polydec(x0i, pi, vb_ref);
-			u0 = polydec(u0i, pi, vb_ref);	
+			copy(vb_ref.data(), vb_ref.data()+vb_ref.size(), p.begin());
+			c = polytopic_coordinates(box, p);
+			#if DEBUG
+				ROS_INFO_STREAM("c = ("<<c[0]<<","<<c[1]<<","<<c[2]<<","<<c[3]<<","<<c[4]<<","<<c[5]<<","<<c[6]<<","<<c[7]<<")");
+			#endif
+			K = interpolate(c, Ki);
+			x0 = interpolate(c, x0i);
+			u0 = interpolate(c, u0i);
+			#if DEBUG
+				ROS_INFO_STREAM("K = " << K);
+			#endif
 
 			/* Construct the aircraft state vector perturbations */
 			dx(0) = pose_data.pose.position.x - qN0;
@@ -367,10 +414,17 @@ int main( int argc, char **argv ) {
 			dx(13) = delta(1) - u0(1);
 			dx(14) = delta(2) - u0(2);
 			dx(15) = delta(3) - u0(3);
+			#if DEBUG
+				ROS_INFO_STREAM("dx = " << dx);
+			#endif
+			ROS_INFO_STREAM("delta psi = " << dx(5));
 
 			/* Compute the state-feedback control law.
 			 * Recall, u is the un-normalized commanded virtual actuator vector. */
 			u = -K*dx + u0;
+			#if DEBUG
+				ROS_INFO_STREAM("u = " << u);
+			#endif
 
 			/* Scale the inputs between -1 and 1 for PX4 */
 			input[0] = 0; //TODO: etc...
