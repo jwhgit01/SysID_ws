@@ -116,3 +116,30 @@ Eigen::MatrixXd interpolate(const vector<double> c, const vector<Eigen::MatrixXd
 	return K;
 }
 
+/**
+ * @brief Convert quaternions to Euler Angles
+ */
+Eigen::Vector3d quat2eul(const Eigen::Quaterniond &q, const double psi0) {
+	/* Initialize result */
+	Eigen::Vector3d Theta;
+
+	// roll (x-axis rotation)
+    double sinr_cosp = 2 * (q.w() * q.x() + q.y() * q.z());
+    double cosr_cosp = 1 - 2 * (q.x() * q.x() + q.y() * q.y());
+    Theta(0) = atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = sqrt(1 + 2 * (q.w() * q.y() - q.x() * q.z()));
+    double cosp = sqrt(1 - 2 * (q.w() * q.y() - q.x() * q.z()));
+    Theta(1) = 2 * atan2(sinp, cosp) - M_PI_2;
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (q.w() * q.z() + q.x() * q.y());
+    double cosy_cosp = 1 - 2 * (q.y() * q.y() + q.z() * q.z());
+    Theta(2) = atan2(siny_cosp, cosy_cosp);
+
+	return Theta;
+
+}
+
+

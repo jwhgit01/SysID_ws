@@ -10,8 +10,9 @@
 
 using namespace std;
 
-/* Debugging mode */
-#define DEBUG false
+/* Debugging modes */
+#define DEBUG_TIMING 	true
+#define DEBUG 			true
 
 /* Numbers of states, inputs, LPV vertices, parameters, and rotors */
 static constexpr int nx = 16;
@@ -38,6 +39,7 @@ const int fs = 100; // sampling rate of the input signal
 
 /* Define the designed amplitude of atuator_controls excitatons */
 const double amp_d = 1; // TODO: determine this value
+const double amp_yawrate = 45*(3.1415926/180.0);
 
 /* Constants for conversions */
 static constexpr double rpm2rps = 0.104719755;
@@ -157,9 +159,9 @@ int main( int argc, char **argv ) {
 	bool PTI = false;
 	int time_idx = 0;
 	double t, t0, t1, qN0, qE0, qD0, psi0;
-	geometry_msgs::Quaternion q0;
-	Eigen::Quaterniond q1;
-	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, Theta_ENU, p0;
+	geometry_msgs::Quaternion q_ROS;
+	Eigen::Quaterniond q_IB, q_IE, q_EV, q_VB;
+	Eigen::Vector3d vi_ref, vb_ref, vi, vb, Theta, p0;
 	Eigen::VectorXd dx(nx);
 	Eigen::VectorXd x0(nx);
 	Eigen::VectorXd u(nu);
@@ -181,6 +183,14 @@ int main( int argc, char **argv ) {
 	vector<float> vb_ref_vec(3,0);
 	vector<float> Omega_vec(nr,0);
 	R_IB.setIdentity();
+	//R_IE << 0.0,-1.0, 0.0,
+	//      -1.0, 0.0, 0.0,
+	//        0.0, 0.0,-1.0;
+	//R_VB << 1.0, 0.0, 0.0,
+	//        0.0,-1.0, 0.0,
+	//        0.0, 0.0,-1.0;
+	q_IE = Eigen::AngleAxisd(-M_PI_2, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
+	q_VB = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
 
 	/* Load the CSV multisine files into maps */
 	std::map<int,vector<float>> InputExcitationData;
@@ -254,23 +264,37 @@ int main( int argc, char **argv ) {
 		Debug(debug_pub, "ROS is ready!");
 	#endif
 
+	#if DEBUG_TIMING
+		double t_now, t_prev;
+	#endif
+
 	/**
 	 * @brief Main loop
 	 * @details While everything is okay, loop at the specified rate, fs
 	 */
 	while (ros::ok()) {
+		#if DEBUG_TIMING
+			t_now = ros::Time::now().toSec();
+			ROS_INFO_STREAM("fs = " << 1/(t_now-t_prev));
+			t_prev = t_now;
+		#endif
 
-		/* Get aircraft attitude from quaternion */
-		q0 = imu_data.orientation;
-		ROS_INFO_STREAM("q_IMU =\n" << q0);
-		q0 = pose_data.pose.orientation;
-		ROS_INFO_STREAM("q_pose =\n" << q0);
-		q1 = {q0.w, q0.x, q0.y, q0.z};
-		R_IB = q1.toRotationMatrix();
-		Theta_ENU = R_IB.eulerAngles(2,1,0);
-		ROS_INFO_STREAM("Theta_ENU =\n" << Theta_ENU);
-		Theta << Theta_ENU(2), -Theta_ENU(1), -Theta_ENU(0);
-		//ROS_INFO_STREAM("Theta =\n" << Theta);
+		/* Get aircraft attitude from quaternion.
+		 *
+		 * Frame conventions:
+		 * 	E = East-North-Up		MAVROS local frame 
+		 * 	V = Front-Left-Up		MAVROS body frame
+		 * 	I = North-East-Down		Aero local frame 
+		 * 	B = Front-Right-Down	Aero body frame 
+		 */
+		q_ROS = imu_data.orientation; // mavros quaternion
+		q_EV = {q_ROS.w, q_ROS.x, q_ROS.y, q_ROS.z}; // Eigen quaternion
+		//R_EV = q1.toRotationMatrix(); // Convert to rotation matrix
+		q_IB = q_IE*q_EV*q_VB; // Correct for frame convention
+		Theta = quat2eul(q_IB,0.0);
+		#if DEBUG
+			ROS_INFO_STREAM("Theta =\n" << Theta);
+		#endif
 
 		/* If the we are not in PTI mode, pass through manual inputs as velocity commands */
 		if (!PTI) {
@@ -280,18 +304,16 @@ int main( int argc, char **argv ) {
 			vb_ref << da_cmd, de_cmd, 0.0;
 
 			/* Convert horizontal plane body velocity commands to the NED frame. */
-			vi_ref = R_IB*vb_ref;
+			vi_ref = q_IB*vb_ref;
 
 			/* Pass through manual inputs as velocity commands. */
 			cmd_vel.linear.x = vi_ref(0);
 			cmd_vel.linear.y = vi_ref(1);
 			cmd_vel.linear.z = (2.0*dt_cmd-1.0);
-			cmd_vel.angular.z = 45*(3.1415926/180.0)*dr_cmd;
+			cmd_vel.angular.z = amp_yawrate*dr_cmd;
 
-			#if DEBUG
-				ROS_INFO_STREAM("vi_d = (" << cmd_vel.linear.x <<","<< cmd_vel.linear.y <<","<< cmd_vel.linear.x <<")");
-				//Debug(debug_pub,"vi_d = (" << cmd_vel.linear.x <<","<< cmd_vel.linear.y <<","<< cmd_vel.linear.x <<")");
-			#endif
+			/* Publish velocity commands */
+			cmd_vel_pub.publish(cmd_vel);
 			
 			/* If we have switched to PTI switch to HIGH, capture initial conditions */
 			if ( PTI_PWM > 1500 ) {
@@ -306,6 +328,7 @@ int main( int argc, char **argv ) {
 	
 				/* Capture initial conditions */
 				t0 = ros::Time::now().toSec();
+
 				// TODO: make sure this isn't ENU
 				qN0 = pose_data.pose.position.x;
 				qE0 = pose_data.pose.position.y;
@@ -319,7 +342,7 @@ int main( int argc, char **argv ) {
 				/* Initialize the input to be the nominal value
 				 * for the current condition. */
 				vi << velocity_data.twist.linear.x, velocity_data.twist.linear.y, velocity_data.twist.linear.z;
-				vb = R_IB*vi;
+				vb = q_IB*vi;
 				copy(vb.data(), vb.data()+vb.size(), p.begin());
 				#if DEBUG
 					ROS_INFO_STREAM("vb =\n" << vb);
@@ -347,8 +370,7 @@ int main( int argc, char **argv ) {
 			/* Compute the time index in miliseconds */
 			t1 = ros::Time::now().toSec();
 			int time_idx = (int)(floor((t1-t0)*(double)fs)) % (T*fs);
-			#if DEBUG
-				ROS_INFO_STREAM("t1 = " + to_string(t1));
+			#if DEBUG_TIMING
 				ROS_INFO_STREAM("time_idx = " + to_string(time_idx));
 			#endif
 
@@ -357,13 +379,11 @@ int main( int argc, char **argv ) {
 				Omega(i) = esc_status_data.esc_status[i].rpm*rpm2rps;
 			}
 			#if DEBUG
-				ROS_INFO_STREAM("Omega = (" << Omega(0) <<","<< Omega(1) <<","<< Omega(2) <<","<< Omega(3) <<")");
-				//Debug(debug_pub,"Omega = (" << Omega(0) <<","<< Omega(1) <<","<< Omega(2) <<","<< Omega(3) <<")");
+				ROS_INFO_STREAM("Omega =\n" << Omega);
 			#endif
 			delta = M*Omega;
 			#if DEBUG
-				ROS_INFO_STREAM("delta = (" << delta(0) <<","<< delta(1) <<","<< delta(2) <<","<< delta(3) <<")");
-				//Debug(debug_pub,"Omega = (" << delta(0) <<","<< delta(1) <<","<< delta(2) <<","<< delta(3) <<")");
+				ROS_INFO_STREAM("delta =\n" << delta);
 			#endif
 
 			/* Get the velocity refererence and input excitation vectors from the hash maps.
@@ -378,9 +398,10 @@ int main( int argc, char **argv ) {
 			/* Convert interial velocity measurements to the body frame. */
 			// TODO: make sure this is the right directions
 			vi << velocity_data.twist.linear.x, velocity_data.twist.linear.y, velocity_data.twist.linear.z;
-			vb = R_IB*vi;
+			vb = q_IB*vi;
 			#if DEBUG
-				ROS_INFO_STREAM("vb = " << vb);
+				ROS_INFO_STREAM("vi =\n" << vi);
+				ROS_INFO_STREAM("vb =\n" << vb);
 			#endif
 
 			/* Compute the feedback gain, nominal states, and nominal inputs 
@@ -394,7 +415,13 @@ int main( int argc, char **argv ) {
 			x0 = interpolate(c, x0i);
 			u0 = interpolate(c, u0i);
 			#if DEBUG
-				ROS_INFO_STREAM("K = " << K);
+				ROS_INFO_STREAM("K =\n" << K);
+			#endif
+			#if DEBUG
+				ROS_INFO_STREAM("x0 =\n" << x0);
+			#endif
+			#if DEBUG
+				ROS_INFO_STREAM("u0 =\n" << u0);
 			#endif
 
 			/* Construct the aircraft state vector perturbations */
@@ -414,10 +441,17 @@ int main( int argc, char **argv ) {
 			dx(13) = delta(1) - u0(1);
 			dx(14) = delta(2) - u0(2);
 			dx(15) = delta(3) - u0(3);
+
+			/* Unwrap delta psi */
+			if (dx(5) > M_PI) {
+				dx(5) = dx(5) - 2*M_PI;
+			} else if (dx(5) < -M_PI) {
+				dx(5) = dx(5) + 2*M_PI;
+			}
+
 			#if DEBUG
-				ROS_INFO_STREAM("dx = " << dx);
+				ROS_INFO_STREAM("dx =\n" << dx);
 			#endif
-			ROS_INFO_STREAM("delta psi = " << dx(5));
 
 			/* Compute the state-feedback control law.
 			 * Recall, u is the un-normalized commanded virtual actuator vector. */
