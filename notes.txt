@@ -1,0 +1,13 @@
+# Terminal 1
+roscore
+
+# Terminal 2
+roslaunch mavros px4.launch fcu_url:="/dev/ttyUSB0:921600"
+
+# Terminal 3
+source devel/setup.bash
+rosrun sysid_pkg hinf_sysid_node
+
+# Terminal 4 (ssh)
+rostopic echo debug_pub
+
