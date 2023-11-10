@@ -58,6 +58,7 @@ mavros_msgs::RCIn rc_input;
 double amp = 0.0;
 int PTI_PWM = 0;
 double mag = 0;
+double mag_w = 0;
 unsigned int a,b;
 double da_cmd, de_cmd, dr_cmd, dt_cmd;
 void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
@@ -83,10 +84,13 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 	}
 	if (rc_input.channels[9] > 1666) {
 		mag = 10.0;
+		mag_w = 5.0;
 	} else if (rc_input.channels[9] > 1333) {
 	    mag = 5.0;
+	    mag_w = 2.5;
 	} else {
 		mag = 0.0;
+		mag_w = 0.0;
 	}
 	amp = 1.0*(rc_input.channels[10]-1102)/796.0; // R Knob, amp in (0, 1) - Use for excitation amplitude
 }
@@ -251,13 +255,13 @@ int main( int argc, char **argv ) {
 			} else if (a==-1 && b==0) {
 				vb_ss << +mag, +mag, 0.0;
 			} else if (a==0 && b==0) {
-				vb_ss << -mag, -mag, +mag; // This "+" is because of the ENU mavros convention
+				vb_ss << -mag, -mag, +mag_w; // This "+" is because of the ENU mavros convention
 			} else if (a==1 && b==0) {
-				vb_ss << +mag, -mag, +mag;
+				vb_ss << +mag, -mag, +mag_w;
 			} else if (a==-1 && b==1) {
-				vb_ss << -mag, +mag, +mag;
+				vb_ss << -mag, +mag, +mag_w;
 			} else if (a==0 && b==1) {
-				vb_ss << +mag, +mag, +mag;
+				vb_ss << +mag, +mag, +mag_w;
 			} else {
 				vb_ss << 0.0, 0.0, 0.0;
 			}

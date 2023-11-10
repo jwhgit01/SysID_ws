@@ -38,8 +38,11 @@ const int T = 30; // final time of the input signal
 const int fs = 100; // sampling rate of the input signal
 
 /* Define the designed amplitude of atuator_controls excitatons */
-const double amp_d = 1; // TODO: determine this value
+const double amp_d = 1; // Units of rad/s
 const double amp_yawrate = 45*(3.1415926/180.0);
+
+/* Motor mapping */
+const double Kmotor = 1100;
 
 /* Constants for conversions */
 static constexpr double rpm2rps = 0.104719755;
@@ -460,8 +463,10 @@ int main( int argc, char **argv ) {
 				ROS_INFO_STREAM("u = " << u);
 			#endif
 
-			/* Scale the inputs between -1 and 1 for PX4 */
-			input[0] = 0; //TODO: etc...
+			/* Scale the inputs between 0 and 1 for PX4 */
+			for (int i = 0; i < nr; i++) {
+				input[i] = u(i)/Kmotor;
+			}
 			
 			/* Populate the actuator controls with the control inputs
 			 * plus the excitation signal. "amp" scales the excitation inputs with
