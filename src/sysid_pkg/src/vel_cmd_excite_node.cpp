@@ -87,7 +87,7 @@ void rcin_cb( const mavros_msgs::RCIn::ConstPtr& msg ) {
 		mag_w = 5.0;
 	} else if (rc_input.channels[9] > 1333) {
 	    mag = 5.0;
-	    mag_w = 2.5;
+	    mag_w = 5.0;
 	} else {
 		mag = 0.0;
 		mag_w = 0.0;
