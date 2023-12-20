@@ -1,0 +1,35 @@
+# Base image
+FROM ros:noetic-ros-base
+
+# Install catkin 
+RUN apt update && apt install -y \
+    ros-noetic-catkin \
+    python3-catkin-tools \
+    python3-wstool \
+    python3-catkin-lint \
+    python3-pip
+RUN pip3 install osrf-pycommon
+
+# Install MAVROS
+RUN apt install -y \
+    ros-noetic-mavros \
+    ros-noetic-mavros-extras \
+    ros-noetic-mavros-msgs
+RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh \
+    && bash ./install_geographiclib_datasets.sh
+
+# Source the ROS installation and the workspace
+RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+RUN echo "source /catkin_ws/devel/setup.bash" >> /root/.bashrc
+
+# Set the working directory in the container
+WORKDIR /catkin_ws
+
+# Add the contents of the ROS workspace to the container
+ADD . /catkin_ws
+
+# Build your ROS workspace
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin_make"
+
+# Set entry point
+CMD ["/bin/bash"]

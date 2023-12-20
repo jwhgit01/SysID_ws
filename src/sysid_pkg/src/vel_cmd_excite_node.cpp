@@ -341,9 +341,6 @@ int main( int argc, char **argv ) {
 		
 		// Publish velocity commands
 		cmd_vel_pub.publish(cmd_vel);
-		#if DEBUG
-			Debug(debug_pub, "u = "+to_string(cmd_vel.linear.x)+","+to_string(cmd_vel.linear.y)+","+to_string(cmd_vel.linear.z)+","+to_string(cmd_vel.angular.z));
-		#endif
 
 		// Calls any remaining callbacks
 		ros::spinOnce();
