@@ -192,7 +192,7 @@ int main( int argc, char **argv ) {
 	//R_VB << 1.0, 0.0, 0.0,
 	//        0.0,-1.0, 0.0,
 	//        0.0, 0.0,-1.0;
-	q_IE = Eigen::AngleAxisd(-M_PI_2, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
+	q_IE = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX()) * Eigen::AngleAxisd(-M_PI_2, Eigen::Vector3d::UnitZ());
 	q_VB = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
 
 	/* Load the CSV multisine files into maps */
